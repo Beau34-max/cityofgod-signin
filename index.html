@@ -449,8 +449,6 @@
         <div class="step-dot" id="p-dot-2">2</div>
         <div class="step-line" id="p-line-2"></div>
         <div class="step-dot" id="p-dot-3">3</div>
-        <div class="step-line" id="p-line-3"></div>
-        <div class="step-dot" id="p-dot-4">4</div>
       </div>
 
       <!-- P-STEP 1: Guardian -->
@@ -496,45 +494,8 @@
         </div>
       </div>
 
-      <!-- P-STEP 3: Visit -->
+      <!-- P-STEP 3: Confirm -->
       <div class="step-panel" id="p-step-3">
-        <div>
-          <div class="step-heading"><i class="fas fa-calendar-check" style="color:var(--blue);margin-right:8px;"></i>Your Visit</div>
-          <div class="step-sub">Tell us about your visit today</div>
-        </div>
-        <div class="field-group">
-          <label>Who are you here to see? <span class="req">*</span></label>
-          <input type="text" id="p-host" list="host-list" placeholder="Enter staff member's name" autocomplete="off">
-          <datalist id="host-list">
-            <option value="CEO">
-            <option value="Reception">
-            <option value="Children's Lead">
-            <option value="Class Teacher">
-            <option value="Manager">
-            <option value="Coordinator">
-            <option value="Volunteer Manager">
-          </datalist>
-        </div>
-        <div class="field-group">
-          <label>Reason for visit <span class="req">*</span></label>
-          <select id="p-purpose">
-            <option value="">— Select reason —</option>
-            <option>Drop-off / Collection</option>
-            <option>Parent Meeting / Appointment</option>
-            <option>Children's Session / Activity</option>
-            <option>Volunteering</option>
-            <option>Training / Workshop</option>
-            <option>Other</option>
-          </select>
-        </div>
-        <div class="form-nav">
-          <button class="btn-back" onclick="pGoStep(2)"><i class="fas fa-arrow-left"></i></button>
-          <button class="btn-next" onclick="pGoStep(4)">Next <i class="fas fa-arrow-right"></i></button>
-        </div>
-      </div>
-
-      <!-- P-STEP 4: Confirm -->
-      <div class="step-panel" id="p-step-4">
         <div>
           <div class="step-heading"><i class="fas fa-clipboard-check" style="color:var(--blue);margin-right:8px;"></i>Confirmation</div>
           <div class="step-sub">Please read and agree before signing in</div>
@@ -545,10 +506,6 @@
             <span class="check-item-text"><strong>Safeguarding:</strong> I confirm I have read the safeguarding information at reception and agree to abide by the City of God Children Safeguarding Policy.</span>
           </label>
           <label class="check-item">
-            <input type="checkbox" id="p-chk-badge">
-            <span class="check-item-text"><strong>Visitor Badge:</strong> I agree to wear my visitor badge visibly at all times and return it on leaving.</span>
-          </label>
-          <label class="check-item">
             <input type="checkbox" id="p-chk-gdpr">
             <span class="check-item-text"><strong>Data Consent:</strong> I consent to my and my children's details being stored securely for safeguarding purposes in accordance with UK GDPR.</span>
           </label>
@@ -557,7 +514,7 @@
           <strong>Privacy Notice:</strong> Your name and your children's details will be stored securely by City of God Children Department for <strong>12 months</strong> then deleted. Used solely for safeguarding, security and emergency evacuation. Contact us to request access or deletion.
         </div>
         <div class="form-nav">
-          <button class="btn-back" onclick="pGoStep(3)"><i class="fas fa-arrow-left"></i></button>
+          <button class="btn-back" onclick="pGoStep(2)"><i class="fas fa-arrow-left"></i></button>
           <button class="btn-submit" id="p-btn-submit" onclick="submitParent()">
             <span id="p-submit-label"><i class="fas fa-check"></i> Sign In</span>
             <div class="spinner" id="p-spinner"></div>
@@ -666,10 +623,6 @@
           <label class="check-item">
             <input type="checkbox" id="s-chk-safeguarding">
             <span class="check-item-text"><strong>Safeguarding:</strong> I confirm I have read and understood the safeguarding policy and will follow all safeguarding procedures during my time here.</span>
-          </label>
-          <label class="check-item">
-            <input type="checkbox" id="s-chk-badge">
-            <span class="check-item-text"><strong>Visitor Badge:</strong> I agree to wear my staff/visitor badge visibly at all times and return it when I leave.</span>
           </label>
           <label class="check-item">
             <input type="checkbox" id="s-chk-gdpr">
@@ -812,17 +765,17 @@ function goWelcome() {
 /* ── Reset ── */
 function resetAll() {
   // parent
-  ['p-first','p-last','p-host','p-purpose'].forEach(id => { const el=document.getElementById(id); if(el) el.value=''; });
-  ['p-chk-safeguarding','p-chk-badge','p-chk-gdpr'].forEach(id => { const el=document.getElementById(id); if(el) el.checked=false; });
+  ['p-first','p-last'].forEach(id => { const el=document.getElementById(id); if(el) el.value=''; });
+  ['p-chk-safeguarding','p-chk-gdpr'].forEach(id => { const el=document.getElementById(id); if(el) el.checked=false; });
   childCount = 0;
   document.getElementById('children-list').innerHTML = '';
   updateAddChildBtn();
   pCurrentStep = 1;
-  updateProgress('p', 4);
+  updateProgress('p', 3);
   document.querySelectorAll('#screen-parent .step-panel').forEach((p,i) => p.classList.toggle('active', i===0));
   // staff
   ['s-first','s-last','s-role','s-dbs','s-host'].forEach(id => { const el=document.getElementById(id); if(el) el.value=''; });
-  ['s-chk-safeguarding','s-chk-badge','s-chk-gdpr'].forEach(id => { const el=document.getElementById(id); if(el) el.checked=false; });
+  ['s-chk-safeguarding','s-chk-gdpr'].forEach(id => { const el=document.getElementById(id); if(el) el.checked=false; });
   sCurrentStep = 1;
   updateProgress('s', 3);
   document.querySelectorAll('#screen-staff .step-panel').forEach((p,i) => p.classList.toggle('active', i===0));
@@ -854,7 +807,7 @@ function pGoStep(n) {
   if (err) { showToast(err, 'error'); return; }
   pCurrentStep = n;
   document.querySelectorAll('#screen-parent .step-panel').forEach((p,i) => p.classList.toggle('active', i+1===n));
-  updateProgress('p', 4);
+  updateProgress('p', 3);
 }
 
 function pValidateStep(n) {
@@ -869,10 +822,6 @@ function pValidateStep(n) {
       const name = row.querySelector('.child-name');
       if (!name.value.trim()) return 'Please enter a name for each child.';
     }
-  }
-  if (n === 3) {
-    if (!val('p-host'))    return 'Please enter who you are here to see.';
-    if (!val('p-purpose')) return 'Please select a reason for your visit.';
   }
   return null;
 }
@@ -939,8 +888,6 @@ function getChildren() {
 async function submitParent() {
   if (!document.getElementById('p-chk-safeguarding').checked)
     return showToast('Please confirm you have read the safeguarding information.', 'error');
-  if (!document.getElementById('p-chk-badge').checked)
-    return showToast('Please confirm you will wear a visitor badge.', 'error');
   if (!document.getElementById('p-chk-gdpr').checked)
     return showToast('Please consent to data storage to proceed.', 'error');
 
@@ -957,8 +904,8 @@ async function submitParent() {
     first_name:   val('p-first'),
     last_name:    val('p-last'),
     organisation: ORG,
-    host_name:    val('p-host'),
-    purpose:      val('p-purpose'),
+    host_name:    'N/A',
+    purpose:      'Drop-off / Collection',
     dbs_status:   'N/A',
     badge_id:     badgeId,
     signed_in_at: now.toISOString(),
@@ -1032,8 +979,6 @@ function sValidateStep(n) {
 async function submitStaff() {
   if (!document.getElementById('s-chk-safeguarding').checked)
     return showToast('Please confirm you have read the safeguarding policy.', 'error');
-  if (!document.getElementById('s-chk-badge').checked)
-    return showToast('Please confirm you will wear your badge.', 'error');
   if (!document.getElementById('s-chk-gdpr').checked)
     return showToast('Please consent to data storage to proceed.', 'error');
 
