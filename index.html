@@ -3,23 +3,23 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>Visitor Sign In — City of God Children Department</title>
+  <title>Sign In — City of God Children Department</title>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
     :root {
-      --blue:    #1a3f8f;
-      --blue-d:  #0f2660;
-      --blue-l:  #eff4ff;
-      --blue-m:  #c7d7fd;
-      --gold:    #f59e0b;
-      --red:     #dc2626;
-      --text:    #1a1a1a;
-      --muted:   #6b7280;
-      --border:  #dde3f0;
-      --radius:  14px;
+      --blue:   #1a3f8f;
+      --blue-d: #0f2660;
+      --blue-l: #eff4ff;
+      --blue-m: #c7d7fd;
+      --gold:   #f59e0b;
+      --red:    #dc2626;
+      --text:   #1a1a1a;
+      --muted:  #6b7280;
+      --border: #dde3f0;
+      --radius: 14px;
     }
 
     html, body {
@@ -34,49 +34,31 @@
     .kiosk-header {
       background: var(--blue-d);
       padding: 14px 24px;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      position: fixed;
-      top: 0; left: 0; right: 0;
-      z-index: 100;
+      display: flex; align-items: center; justify-content: space-between;
+      position: fixed; top: 0; left: 0; right: 0; z-index: 100;
       box-shadow: 0 2px 12px rgba(0,0,0,0.3);
     }
     .kiosk-brand { display: flex; align-items: center; gap: 12px; }
-    .kiosk-brand-name {
-      color: #fff;
-      font-size: 1rem;
-      font-weight: 700;
-      letter-spacing: 0.04em;
-      text-transform: uppercase;
-      line-height: 1.1;
-    }
-    .kiosk-brand-name small {
-      display: block;
-      font-size: 0.65rem;
-      font-weight: 400;
-      opacity: 0.7;
-      text-transform: none;
-      letter-spacing: 0;
-    }
     .kiosk-brand-icon {
-      width: 42px; height: 42px;
-      border-radius: 50%;
+      width: 42px; height: 42px; border-radius: 50%;
       background: var(--gold);
       display: flex; align-items: center; justify-content: center;
       font-size: 1.3rem; color: var(--blue-d);
     }
-    .kiosk-clock { text-align: right; color: #fff; }
-    .kiosk-clock .time {
-      font-size: 1.6rem; font-weight: 700; line-height: 1;
-      font-variant-numeric: tabular-nums;
+    .kiosk-brand-name {
+      color: #fff; font-size: 1rem; font-weight: 700;
+      letter-spacing: 0.04em; text-transform: uppercase; line-height: 1.1;
     }
+    .kiosk-brand-name small {
+      display: block; font-size: 0.65rem; font-weight: 400;
+      opacity: 0.7; text-transform: none; letter-spacing: 0;
+    }
+    .kiosk-clock { text-align: right; color: #fff; }
+    .kiosk-clock .time { font-size: 1.6rem; font-weight: 700; line-height: 1; font-variant-numeric: tabular-nums; }
     .kiosk-clock .date-str { font-size: 0.72rem; opacity: 0.7; margin-top: 2px; }
 
-    /* ── MAIN ── */
+    /* ── LAYOUT ── */
     .kiosk-main { padding-top: 72px; height: 100%; display: flex; flex-direction: column; overflow: hidden; }
-
-    /* ── SCREENS ── */
     .screen { display: none; flex-direction: column; height: 100%; overflow-y: auto; }
     .screen.active { display: flex; }
 
@@ -84,7 +66,7 @@
     .welcome-body {
       flex: 1; display: flex; flex-direction: column;
       align-items: center; justify-content: center;
-      padding: 24px 20px; gap: 24px; text-align: center;
+      padding: 24px 20px; gap: 22px; text-align: center;
     }
     .welcome-icon {
       width: 90px; height: 90px; border-radius: 50%;
@@ -96,42 +78,45 @@
     .welcome-title { font-size: 2rem; font-weight: 800; color: var(--blue-d); }
     .welcome-sub   { font-size: 1rem; color: var(--muted); max-width: 380px; }
     .mode-btns {
-      display: flex; gap: 16px; flex-wrap: wrap;
-      justify-content: center; width: 100%; max-width: 560px;
+      display: flex; gap: 14px; flex-wrap: wrap;
+      justify-content: center; width: 100%; max-width: 620px;
     }
     .mode-btn {
-      flex: 1; min-width: 180px; padding: 20px 24px;
-      border-radius: var(--radius); font-size: 1.2rem; font-weight: 700;
+      flex: 1; min-width: 160px; padding: 18px 20px;
+      border-radius: var(--radius); font-size: 1.1rem; font-weight: 700;
       cursor: pointer; border: 3px solid transparent; transition: all 0.18s;
-      display: flex; align-items: center; justify-content: center; gap: 12px;
+      display: flex; flex-direction: column; align-items: center; justify-content: center;
+      gap: 8px; letter-spacing: 0.02em;
     }
-    .mode-btn-primary { background: var(--blue); color: #fff; box-shadow: 0 4px 20px rgba(26,63,143,0.35); }
-    .mode-btn-primary:hover { background: var(--blue-d); }
-    .mode-btn-outline { background: #fff; color: var(--blue); border-color: var(--blue); }
-    .mode-btn-outline:hover { background: var(--blue-l); }
+    .mode-btn i { font-size: 1.6rem; }
+    .mode-btn small { font-size: 0.72rem; font-weight: 400; opacity: 0.85; }
+    .mode-btn-parent { background: var(--blue); color: #fff; box-shadow: 0 4px 20px rgba(26,63,143,0.35); }
+    .mode-btn-parent:hover { background: var(--blue-d); }
+    .mode-btn-staff  { background: var(--gold); color: var(--blue-d); box-shadow: 0 4px 20px rgba(245,158,11,0.3); }
+    .mode-btn-staff:hover  { background: #d97706; color: #fff; }
+    .mode-btn-signout { background: #fff; color: var(--blue); border-color: var(--blue); }
+    .mode-btn-signout:hover { background: var(--blue-l); }
     .safeguard-note {
-      font-size: 0.75rem; color: var(--muted); max-width: 420px;
+      font-size: 0.75rem; color: var(--muted); max-width: 500px;
       background: #fff; border: 1px solid var(--border);
       border-radius: 8px; padding: 10px 14px;
       display: flex; gap: 8px; align-items: flex-start; text-align: left;
     }
     .safeguard-note i { color: var(--blue); margin-top: 1px; flex-shrink: 0; }
 
-    /* ── FORM CARD ── */
+    /* ── FORM ── */
     .form-body {
       flex: 1; display: flex; flex-direction: column;
-      padding: 20px 16px 24px; max-width: 600px;
-      width: 100%; margin: 0 auto;
+      padding: 20px 16px 24px; max-width: 600px; width: 100%; margin: 0 auto;
     }
 
     /* ── PROGRESS ── */
     .progress-row { display: flex; align-items: center; gap: 8px; margin-bottom: 20px; }
     .step-dot {
       width: 32px; height: 32px; border-radius: 50%;
-      border: 2px solid var(--border);
+      border: 2px solid var(--border); background: #fff;
       display: flex; align-items: center; justify-content: center;
-      font-size: 0.8rem; font-weight: 700;
-      color: var(--muted); transition: all 0.2s; background: #fff;
+      font-size: 0.8rem; font-weight: 700; color: var(--muted); transition: all 0.2s;
     }
     .step-dot.done    { background: var(--blue); border-color: var(--blue); color: #fff; }
     .step-dot.current { border-color: var(--blue); color: var(--blue); }
@@ -141,7 +126,7 @@
     /* ── STEP PANELS ── */
     .step-panel { display: none; flex-direction: column; gap: 14px; }
     .step-panel.active { display: flex; }
-    .step-heading { font-size: 1.3rem; font-weight: 800; color: var(--blue-d); margin-bottom: 4px; }
+    .step-heading { font-size: 1.3rem; font-weight: 800; color: var(--blue-d); margin-bottom: 2px; }
     .step-sub     { font-size: 0.85rem; color: var(--muted); }
 
     /* ── FIELDS ── */
@@ -157,11 +142,55 @@
     }
     .field-group input:focus,
     .field-group select:focus { border-color: var(--blue); box-shadow: 0 0 0 3px rgba(26,63,143,0.1); }
+    .field-static {
+      padding: 13px 14px; border: 1.5px solid var(--border);
+      border-radius: 10px; font-size: 1rem; background: #f5f7ff;
+      color: var(--blue-d); font-weight: 600;
+    }
     .field-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
 
-    /* DBS */
-    .dbs-section { display: none; }
-    .dbs-section.visible { display: block; }
+    /* ── CHILDREN LIST ── */
+    .children-list { display: flex; flex-direction: column; gap: 10px; }
+    .child-row {
+      background: #fff; border: 1.5px solid var(--border);
+      border-radius: 10px; padding: 12px 14px;
+      display: flex; gap: 10px; align-items: center;
+    }
+    .child-num {
+      width: 28px; height: 28px; border-radius: 50%;
+      background: var(--blue); color: #fff;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 0.8rem; font-weight: 700; flex-shrink: 0;
+    }
+    .child-fields { flex: 1; display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+    .child-fields input,
+    .child-fields select {
+      padding: 10px 12px; border: 1.5px solid var(--border);
+      border-radius: 8px; font-size: 0.9rem; font-family: inherit;
+      background: #fff; color: var(--text); outline: none; width: 100%;
+    }
+    .child-fields input:focus,
+    .child-fields select:focus { border-color: var(--blue); box-shadow: 0 0 0 3px rgba(26,63,143,0.1); }
+    .btn-remove-child {
+      width: 32px; height: 32px; border-radius: 50%;
+      background: #fee2e2; border: none; color: var(--red);
+      font-size: 0.85rem; cursor: pointer; flex-shrink: 0;
+      display: flex; align-items: center; justify-content: center;
+    }
+    .btn-remove-child:hover { background: var(--red); color: #fff; }
+    .btn-add-child {
+      padding: 12px; border-radius: 10px;
+      border: 2px dashed var(--blue-m); background: var(--blue-l);
+      color: var(--blue); font-size: 0.95rem; font-weight: 600;
+      cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px;
+      transition: all 0.15s;
+    }
+    .btn-add-child:hover { border-color: var(--blue); background: #dbeafe; }
+    .btn-add-child:disabled { opacity: 0.4; cursor: not-allowed; }
+    .child-count-note { font-size: 0.78rem; color: var(--muted); text-align: center; }
+
+    /* ── DBS ── */
+    .dbs-section { display: flex; flex-direction: column; gap: 5px; }
     .dbs-note {
       background: #fef9c3; border: 1px solid #fde047; border-radius: 8px;
       padding: 10px 12px; font-size: 0.8rem; color: #713f12;
@@ -182,14 +211,14 @@
     .check-item-text { font-size: 0.85rem; color: #374151; line-height: 1.45; }
     .check-item-text strong { color: var(--blue-d); }
 
-    /* ── GDPR BOX ── */
+    /* ── GDPR ── */
     .gdpr-box {
       background: #fff; border: 1px solid var(--border); border-radius: 8px;
       padding: 12px 14px; font-size: 0.75rem; color: var(--muted); line-height: 1.5;
     }
     .gdpr-box strong { color: var(--text); }
 
-    /* ── NAVIGATION ── */
+    /* ── NAV BUTTONS ── */
     .form-nav { display: flex; gap: 12px; margin-top: 8px; }
     .btn-back {
       padding: 14px 24px; border-radius: 10px; background: #fff;
@@ -208,43 +237,46 @@
     .btn-cancel {
       padding: 14px 20px; border-radius: 10px; background: transparent;
       border: 1.5px solid var(--border); font-size: 0.9rem;
-      color: var(--muted); cursor: pointer; margin-top: 6px; width: 100%;
+      color: var(--muted); cursor: pointer; margin-top: 4px; width: 100%;
+      text-align: center;
     }
     .btn-cancel:hover { color: var(--red); border-color: var(--red); }
 
     /* ── BADGE ── */
     .badge-body {
       flex: 1; display: flex; flex-direction: column;
-      align-items: center; justify-content: center;
-      padding: 24px 20px; gap: 20px;
+      align-items: center; justify-content: center; padding: 20px; gap: 16px;
     }
     .badge-card {
       background: #fff; border: 4px solid var(--blue);
-      border-radius: 20px; padding: 28px 32px;
-      width: 100%; max-width: 380px; text-align: center;
+      border-radius: 20px; padding: 24px 28px;
+      width: 100%; max-width: 400px; text-align: center;
       box-shadow: 0 8px 32px rgba(26,63,143,0.2);
     }
     .badge-type {
       background: var(--blue); color: #fff;
       font-size: 0.7rem; font-weight: 800; letter-spacing: 0.2em;
       text-transform: uppercase; padding: 4px 14px;
-      border-radius: 30px; display: inline-block; margin-bottom: 16px;
+      border-radius: 30px; display: inline-block; margin-bottom: 12px;
     }
-    .badge-name   { font-size: 2rem; font-weight: 800; color: var(--blue-d); line-height: 1.15; }
-    .badge-org    { font-size: 0.9rem; color: var(--muted); margin-top: 4px; }
-    .badge-divider { border: none; border-top: 1px solid var(--border); margin: 14px 0; }
-    .badge-meta   { font-size: 0.82rem; color: #374151; text-align: left; display: flex; flex-direction: column; gap: 6px; }
-    .badge-meta span { display: flex; gap: 8px; }
-    .badge-meta i  { color: var(--blue); width: 14px; margin-top: 1px; }
-    .badge-number {
-      font-size: 1.8rem; font-weight: 900; color: var(--blue);
-      margin-top: 12px; letter-spacing: 0.1em;
+    .badge-type.staff-type { background: var(--gold); color: var(--blue-d); }
+    .badge-name  { font-size: 1.8rem; font-weight: 800; color: var(--blue-d); line-height: 1.15; }
+    .badge-role  { font-size: 0.9rem; color: var(--muted); margin-top: 4px; }
+    .badge-divider { border: none; border-top: 1px solid var(--border); margin: 12px 0; }
+    .badge-children {
+      text-align: left; font-size: 0.85rem; color: #374151;
+      display: flex; flex-direction: column; gap: 5px;
     }
+    .badge-child-row { display: flex; gap: 8px; align-items: center; }
+    .badge-child-row i { color: var(--blue); font-size: 0.8rem; }
+    .badge-meta { font-size: 0.82rem; color: #374151; text-align: left; display: flex; flex-direction: column; gap: 6px; }
+    .badge-meta span { display: flex; gap: 8px; align-items: flex-start; }
+    .badge-meta i { color: var(--blue); width: 14px; margin-top: 2px; flex-shrink: 0; }
+    .badge-number { font-size: 1.8rem; font-weight: 900; color: var(--blue); margin-top: 10px; letter-spacing: 0.1em; }
     .badge-number-label { font-size: 0.7rem; color: var(--muted); text-transform: uppercase; letter-spacing: 0.1em; }
     .badge-instruction {
       font-size: 0.85rem; color: #374151; background: var(--blue-l);
-      border-radius: 10px; padding: 12px 16px;
-      max-width: 380px; text-align: center; line-height: 1.5;
+      border-radius: 10px; padding: 12px 16px; max-width: 400px; text-align: center; line-height: 1.5;
     }
     .badge-countdown { font-size: 0.78rem; color: var(--muted); }
     .btn-done {
@@ -253,7 +285,7 @@
     }
     .btn-done:hover { background: var(--blue-d); }
 
-    /* ── SIGN OUT LIST ── */
+    /* ── SIGN OUT ── */
     .signout-body {
       flex: 1; padding: 16px; max-width: 600px; width: 100%;
       margin: 0 auto; display: flex; flex-direction: column; gap: 14px;
@@ -271,22 +303,24 @@
     .visitor-card-info { flex: 1; min-width: 0; }
     .visitor-card-name { font-weight: 700; font-size: 1rem; color: var(--text); }
     .visitor-card-meta { font-size: 0.78rem; color: var(--muted); margin-top: 3px; }
-    .visitor-card-time {
-      font-size: 0.9rem; font-weight: 700; color: var(--blue);
-      flex-shrink: 0; text-align: right;
+    .visitor-card-badge {
+      display: inline-block; padding: 2px 8px; border-radius: 20px;
+      font-size: 0.68rem; font-weight: 700; margin-right: 6px;
     }
+    .badge-parent { background: #dbeafe; color: var(--blue-d); }
+    .badge-staff  { background: #fef3c7; color: #92400e; }
+    .visitor-card-time { font-size: 0.9rem; font-weight: 700; color: var(--blue); flex-shrink: 0; text-align: right; }
     .visitor-card-time small { display: block; font-size: 0.68rem; font-weight: 400; color: var(--muted); }
     .empty-state { text-align: center; padding: 40px 20px; color: var(--muted); }
     .empty-state i { font-size: 2.5rem; opacity: 0.3; margin-bottom: 12px; display: block; }
     .btn-back-welcome {
       padding: 10px 18px; border-radius: 10px; background: #fff;
       border: 1.5px solid var(--border); font-size: 0.95rem; font-weight: 600;
-      color: var(--muted); cursor: pointer;
-      display: flex; align-items: center; gap: 8px; width: auto; flex: none;
+      color: var(--muted); cursor: pointer; display: flex; align-items: center; gap: 8px;
     }
     .btn-back-welcome:hover { border-color: var(--blue); color: var(--blue); }
 
-    /* ── CONFIRM SCREEN ── */
+    /* ── CONFIRM ── */
     .confirm-body {
       flex: 1; display: flex; flex-direction: column;
       align-items: center; justify-content: center;
@@ -302,8 +336,7 @@
     .confirm-btns { display: flex; gap: 12px; width: 100%; max-width: 360px; }
     .btn-confirm-signout {
       flex: 1; padding: 16px; border-radius: 10px;
-      background: var(--red); border: none;
-      font-size: 1rem; font-weight: 700; color: #fff; cursor: pointer;
+      background: var(--red); border: none; font-size: 1rem; font-weight: 700; color: #fff; cursor: pointer;
     }
     .btn-confirm-signout:hover { background: #b91c1c; }
     .btn-confirm-cancel {
@@ -316,19 +349,14 @@
     /* ── SUCCESS ── */
     .success-body {
       flex: 1; display: flex; flex-direction: column;
-      align-items: center; justify-content: center;
-      padding: 24px; gap: 16px; text-align: center;
+      align-items: center; justify-content: center; padding: 24px; gap: 16px; text-align: center;
     }
     .success-icon {
       width: 80px; height: 80px; border-radius: 50%;
       background: var(--blue); display: flex; align-items: center; justify-content: center;
       font-size: 2.2rem; color: #fff; animation: pop 0.4s ease;
     }
-    @keyframes pop {
-      0%   { transform: scale(0.5); opacity: 0; }
-      70%  { transform: scale(1.1); }
-      100% { transform: scale(1); opacity: 1; }
-    }
+    @keyframes pop { 0% { transform: scale(0.5); opacity: 0; } 70% { transform: scale(1.1); } 100% { transform: scale(1); opacity: 1; } }
     .success-title { font-size: 1.8rem; font-weight: 800; color: var(--blue-d); }
     .success-sub   { font-size: 1rem; color: var(--muted); }
 
@@ -345,7 +373,6 @@
     .toast.success { background: var(--blue); }
     .toast.show    { transform: translateX(-50%) translateY(0); }
 
-    /* ── SPINNER ── */
     .spinner {
       width: 22px; height: 22px;
       border: 3px solid rgba(255,255,255,0.35);
@@ -356,15 +383,15 @@
 
     @media (max-width: 480px) {
       .welcome-title { font-size: 1.5rem; }
-      .mode-btn      { min-width: 140px; font-size: 1rem; padding: 16px 18px; }
+      .mode-btn      { min-width: 130px; font-size: 1rem; padding: 14px 16px; }
       .field-row     { grid-template-columns: 1fr; }
-      .badge-name    { font-size: 1.6rem; }
+      .child-fields  { grid-template-columns: 1fr; }
+      .badge-name    { font-size: 1.5rem; }
     }
   </style>
 </head>
 <body>
 
-<!-- HEADER -->
 <header class="kiosk-header">
   <div class="kiosk-brand">
     <div class="kiosk-brand-icon"><i class="fas fa-child"></i></div>
@@ -381,176 +408,307 @@
 
 <div class="kiosk-main">
 
-  <!-- ═══════════════ WELCOME ═══════════════ -->
+  <!-- ═══ WELCOME ═══ -->
   <div class="screen active" id="screen-welcome">
     <div class="welcome-body">
-      <div class="welcome-icon"><i class="fas fa-id-badge"></i></div>
+      <div class="welcome-icon"><i class="fas fa-hands-holding-child"></i></div>
       <div>
         <div class="welcome-title">Welcome</div>
-        <div class="welcome-sub" style="margin-top:6px;">City of God Children Department — please sign in below</div>
+        <div class="welcome-sub" style="margin-top:6px;">City of God Children Department — please choose an option below</div>
       </div>
       <div class="mode-btns">
-        <button class="mode-btn mode-btn-primary" onclick="startSignIn()">
-          <i class="fas fa-sign-in-alt"></i> Sign In
+        <button class="mode-btn mode-btn-parent" onclick="startParent()">
+          <i class="fas fa-users"></i>
+          Parent / Guardian
+          <small>Sign in with children</small>
         </button>
-        <button class="mode-btn mode-btn-outline" onclick="startSignOut()">
-          <i class="fas fa-sign-out-alt"></i> Sign Out
+        <button class="mode-btn mode-btn-staff" onclick="startStaff()">
+          <i class="fas fa-chalkboard-teacher"></i>
+          Staff / Teacher
+          <small>Sign in as staff</small>
+        </button>
+        <button class="mode-btn mode-btn-signout" onclick="startSignOut()">
+          <i class="fas fa-sign-out-alt"></i>
+          Sign Out
+          <small>End your visit</small>
         </button>
       </div>
       <div class="safeguard-note">
         <i class="fas fa-shield-halved"></i>
-        <span>City of God Children Department is committed to safeguarding. All visitors must sign in and wear a badge during their visit. Your data is stored securely and retained for 12 months in accordance with UK GDPR.</span>
+        <span>City of God Children Department is committed to safeguarding children. All visitors must sign in and wear a badge. Data is held securely for 12 months under UK GDPR.</span>
       </div>
     </div>
   </div>
 
-  <!-- ═══════════════ SIGN IN FORM ═══════════════ -->
-  <div class="screen" id="screen-signin">
+  <!-- ═══ PARENT SIGN IN ═══ -->
+  <div class="screen" id="screen-parent">
     <div class="form-body">
-
-      <!-- Progress -->
       <div class="progress-row">
-        <div class="step-dot current" id="dot-1">1</div>
-        <div class="step-line" id="line-1"></div>
-        <div class="step-dot" id="dot-2">2</div>
-        <div class="step-line" id="line-2"></div>
-        <div class="step-dot" id="dot-3">3</div>
+        <div class="step-dot current" id="p-dot-1">1</div>
+        <div class="step-line" id="p-line-1"></div>
+        <div class="step-dot" id="p-dot-2">2</div>
+        <div class="step-line" id="p-line-2"></div>
+        <div class="step-dot" id="p-dot-3">3</div>
+        <div class="step-line" id="p-line-3"></div>
+        <div class="step-dot" id="p-dot-4">4</div>
       </div>
 
-      <!-- STEP 1 -->
-      <div class="step-panel active" id="step-1">
+      <!-- P-STEP 1: Guardian -->
+      <div class="step-panel active" id="p-step-1">
         <div>
-          <div class="step-heading">About you</div>
-          <div class="step-sub">Please enter your details below</div>
+          <div class="step-heading"><i class="fas fa-user" style="color:var(--blue);margin-right:8px;"></i>Your Details</div>
+          <div class="step-sub">Please enter the parent or guardian's name</div>
         </div>
         <div class="field-row">
           <div class="field-group">
             <label>First Name <span class="req">*</span></label>
-            <input type="text" id="f-first" placeholder="e.g. Sarah" autocomplete="off">
+            <input type="text" id="p-first" placeholder="e.g. Sarah" autocomplete="off">
           </div>
           <div class="field-group">
             <label>Last Name <span class="req">*</span></label>
-            <input type="text" id="f-last" placeholder="e.g. Johnson" autocomplete="off">
+            <input type="text" id="p-last" placeholder="e.g. Johnson" autocomplete="off">
           </div>
         </div>
         <div class="field-group">
-          <label>Organisation / Company <span style="color:var(--muted);font-weight:400;">(optional)</span></label>
-          <select id="f-org">
-            <option value="">— None / External —</option>
-            <option value="City of God Children Department">City of God Children Department</option>
-            <option value="Joybringers Charity">Joybringers Charity</option>
-            <option value="COSENG LIMITED">COSENG LIMITED</option>
-            <option value="Other">Other</option>
-          </select>
+          <label>Organisation</label>
+          <div class="field-static"><i class="fas fa-building" style="margin-right:8px;opacity:0.5;"></i>City of God Children Department</div>
         </div>
         <div class="form-nav">
           <button class="btn-cancel" onclick="goWelcome()"><i class="fas fa-arrow-left"></i> Back</button>
-          <button class="btn-next" onclick="goStep(2)">Next <i class="fas fa-arrow-right"></i></button>
+          <button class="btn-next" onclick="pGoStep(2)">Next <i class="fas fa-arrow-right"></i></button>
         </div>
       </div>
 
-      <!-- STEP 2 -->
-      <div class="step-panel" id="step-2">
+      <!-- P-STEP 2: Children -->
+      <div class="step-panel" id="p-step-2">
         <div>
-          <div class="step-heading">Your visit</div>
-          <div class="step-sub">Tell us about the purpose of your visit</div>
+          <div class="step-heading"><i class="fas fa-child" style="color:var(--blue);margin-right:8px;"></i>Children</div>
+          <div class="step-sub">Add the children you are signing in (up to 5)</div>
+        </div>
+        <div class="children-list" id="children-list"></div>
+        <button class="btn-add-child" id="btn-add-child" onclick="addChild()">
+          <i class="fas fa-plus"></i> Add Child
+        </button>
+        <div class="child-count-note" id="child-count-note"></div>
+        <div class="form-nav">
+          <button class="btn-back" onclick="pGoStep(1)"><i class="fas fa-arrow-left"></i></button>
+          <button class="btn-next" onclick="pGoStep(3)">Next <i class="fas fa-arrow-right"></i></button>
+        </div>
+      </div>
+
+      <!-- P-STEP 3: Visit -->
+      <div class="step-panel" id="p-step-3">
+        <div>
+          <div class="step-heading"><i class="fas fa-calendar-check" style="color:var(--blue);margin-right:8px;"></i>Your Visit</div>
+          <div class="step-sub">Tell us about your visit today</div>
         </div>
         <div class="field-group">
           <label>Who are you here to see? <span class="req">*</span></label>
-          <input type="text" id="f-host" list="host-list" placeholder="Enter staff member's name" autocomplete="off">
+          <input type="text" id="p-host" list="host-list" placeholder="Enter staff member's name" autocomplete="off">
           <datalist id="host-list">
             <option value="CEO">
             <option value="Reception">
+            <option value="Children's Lead">
+            <option value="Class Teacher">
             <option value="Manager">
             <option value="Coordinator">
-            <option value="Children's Lead">
             <option value="Volunteer Manager">
           </datalist>
         </div>
         <div class="field-group">
           <label>Reason for visit <span class="req">*</span></label>
-          <select id="f-purpose" onchange="onPurposeChange()">
+          <select id="p-purpose">
             <option value="">— Select reason —</option>
-            <option>Meeting / Appointment</option>
-            <option>Volunteering</option>
-            <option>Parent / Guardian</option>
-            <option>Contractor / Tradesperson</option>
-            <option>Delivery</option>
-            <option>Job Interview</option>
-            <option>Training / Workshop</option>
             <option>Drop-off / Collection</option>
+            <option>Parent Meeting / Appointment</option>
+            <option>Children's Session / Activity</option>
+            <option>Volunteering</option>
+            <option>Training / Workshop</option>
             <option>Other</option>
           </select>
         </div>
-
-        <div class="field-group dbs-section" id="dbs-section">
-          <label>DBS Certificate <span class="req">*</span></label>
-          <select id="f-dbs">
-            <option value="">— Select DBS status —</option>
-            <option value="Enhanced DBS">Enhanced DBS (working with children / vulnerable adults)</option>
-            <option value="Standard DBS">Standard DBS</option>
-            <option value="Basic DBS">Basic DBS</option>
-            <option value="Awaiting clearance">Awaiting DBS clearance</option>
-            <option value="N/A">N/A — not required for this visit</option>
-          </select>
-          <div class="dbs-note"><i class="fas fa-circle-info" style="margin-top:1px;flex-shrink:0;"></i> For safeguarding purposes, volunteers and contractors working with children must hold a valid Enhanced DBS.</div>
-        </div>
-
         <div class="form-nav">
-          <button class="btn-back" onclick="goStep(1)"><i class="fas fa-arrow-left"></i></button>
-          <button class="btn-next" onclick="goStep(3)">Next <i class="fas fa-arrow-right"></i></button>
+          <button class="btn-back" onclick="pGoStep(2)"><i class="fas fa-arrow-left"></i></button>
+          <button class="btn-next" onclick="pGoStep(4)">Next <i class="fas fa-arrow-right"></i></button>
         </div>
       </div>
 
-      <!-- STEP 3 -->
-      <div class="step-panel" id="step-3">
+      <!-- P-STEP 4: Confirm -->
+      <div class="step-panel" id="p-step-4">
         <div>
-          <div class="step-heading">Confirmation</div>
-          <div class="step-sub">Please read and confirm the following before signing in</div>
+          <div class="step-heading"><i class="fas fa-clipboard-check" style="color:var(--blue);margin-right:8px;"></i>Confirmation</div>
+          <div class="step-sub">Please read and agree before signing in</div>
         </div>
         <div class="check-group">
           <label class="check-item">
-            <input type="checkbox" id="chk-safeguarding">
-            <span class="check-item-text"><strong>Safeguarding:</strong> I confirm I have read and understood the safeguarding information displayed at reception and agree to abide by the City of God Children Safeguarding Policy.</span>
+            <input type="checkbox" id="p-chk-safeguarding">
+            <span class="check-item-text"><strong>Safeguarding:</strong> I confirm I have read the safeguarding information at reception and agree to abide by the City of God Children Safeguarding Policy.</span>
           </label>
           <label class="check-item">
-            <input type="checkbox" id="chk-badge">
-            <span class="check-item-text"><strong>Visitor Badge:</strong> I agree to wear my visitor badge visibly at all times during my visit and return it when I leave.</span>
+            <input type="checkbox" id="p-chk-badge">
+            <span class="check-item-text"><strong>Visitor Badge:</strong> I agree to wear my visitor badge visibly at all times and return it on leaving.</span>
           </label>
           <label class="check-item">
-            <input type="checkbox" id="chk-gdpr">
+            <input type="checkbox" id="p-chk-gdpr">
+            <span class="check-item-text"><strong>Data Consent:</strong> I consent to my and my children's details being stored securely for safeguarding purposes in accordance with UK GDPR.</span>
+          </label>
+        </div>
+        <div class="gdpr-box">
+          <strong>Privacy Notice:</strong> Your name and your children's details will be stored securely by City of God Children Department for <strong>12 months</strong> then deleted. Used solely for safeguarding, security and emergency evacuation. Contact us to request access or deletion.
+        </div>
+        <div class="form-nav">
+          <button class="btn-back" onclick="pGoStep(3)"><i class="fas fa-arrow-left"></i></button>
+          <button class="btn-submit" id="p-btn-submit" onclick="submitParent()">
+            <span id="p-submit-label"><i class="fas fa-check"></i> Sign In</span>
+            <div class="spinner" id="p-spinner"></div>
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══ STAFF SIGN IN ═══ -->
+  <div class="screen" id="screen-staff">
+    <div class="form-body">
+      <div class="progress-row">
+        <div class="step-dot current" id="s-dot-1">1</div>
+        <div class="step-line" id="s-line-1"></div>
+        <div class="step-dot" id="s-dot-2">2</div>
+        <div class="step-line" id="s-line-2"></div>
+        <div class="step-dot" id="s-dot-3">3</div>
+      </div>
+
+      <!-- S-STEP 1: Staff details -->
+      <div class="step-panel active" id="s-step-1">
+        <div>
+          <div class="step-heading"><i class="fas fa-chalkboard-teacher" style="color:var(--blue);margin-right:8px;"></i>Your Details</div>
+          <div class="step-sub">Please enter your name and role</div>
+        </div>
+        <div class="field-row">
+          <div class="field-group">
+            <label>First Name <span class="req">*</span></label>
+            <input type="text" id="s-first" placeholder="e.g. James" autocomplete="off">
+          </div>
+          <div class="field-group">
+            <label>Last Name <span class="req">*</span></label>
+            <input type="text" id="s-last" placeholder="e.g. Williams" autocomplete="off">
+          </div>
+        </div>
+        <div class="field-group">
+          <label>Role <span class="req">*</span></label>
+          <select id="s-role">
+            <option value="">— Select your role —</option>
+            <option>Teacher</option>
+            <option>Teaching Assistant</option>
+            <option>Children's Leader</option>
+            <option>Support Staff</option>
+            <option>Volunteer</option>
+            <option>Coordinator</option>
+            <option>Manager</option>
+            <option>CEO</option>
+            <option>Contractor / Tradesperson</option>
+            <option>Other</option>
+          </select>
+        </div>
+        <div class="field-group">
+          <label>Organisation</label>
+          <div class="field-static"><i class="fas fa-building" style="margin-right:8px;opacity:0.5;"></i>City of God Children Department</div>
+        </div>
+        <div class="form-nav">
+          <button class="btn-cancel" onclick="goWelcome()"><i class="fas fa-arrow-left"></i> Back</button>
+          <button class="btn-next" onclick="sGoStep(2)">Next <i class="fas fa-arrow-right"></i></button>
+        </div>
+      </div>
+
+      <!-- S-STEP 2: DBS + host -->
+      <div class="step-panel" id="s-step-2">
+        <div>
+          <div class="step-heading"><i class="fas fa-shield-halved" style="color:var(--blue);margin-right:8px;"></i>Safeguarding</div>
+          <div class="step-sub">DBS check and reporting line</div>
+        </div>
+        <div class="dbs-section">
+          <div class="field-group">
+            <label>DBS Certificate Status <span class="req">*</span></label>
+            <select id="s-dbs">
+              <option value="">— Select DBS status —</option>
+              <option value="Enhanced DBS">Enhanced DBS (children / vulnerable adults)</option>
+              <option value="Standard DBS">Standard DBS</option>
+              <option value="Basic DBS">Basic DBS</option>
+              <option value="Awaiting clearance">Awaiting DBS clearance</option>
+              <option value="N/A">N/A — not working directly with children today</option>
+            </select>
+          </div>
+          <div class="dbs-note"><i class="fas fa-circle-info" style="margin-top:1px;flex-shrink:0;"></i> All staff and volunteers working with children must hold a valid Enhanced DBS. Please ensure yours is up to date.</div>
+        </div>
+        <div class="field-group">
+          <label>Reporting to / Line Manager <span class="req">*</span></label>
+          <input type="text" id="s-host" list="s-host-list" placeholder="Enter name" autocomplete="off">
+          <datalist id="s-host-list">
+            <option value="CEO">
+            <option value="Children's Lead">
+            <option value="Manager">
+            <option value="Coordinator">
+          </datalist>
+        </div>
+        <div class="form-nav">
+          <button class="btn-back" onclick="sGoStep(1)"><i class="fas fa-arrow-left"></i></button>
+          <button class="btn-next" onclick="sGoStep(3)">Next <i class="fas fa-arrow-right"></i></button>
+        </div>
+      </div>
+
+      <!-- S-STEP 3: Confirm -->
+      <div class="step-panel" id="s-step-3">
+        <div>
+          <div class="step-heading"><i class="fas fa-clipboard-check" style="color:var(--blue);margin-right:8px;"></i>Confirmation</div>
+          <div class="step-sub">Please read and agree before signing in</div>
+        </div>
+        <div class="check-group">
+          <label class="check-item">
+            <input type="checkbox" id="s-chk-safeguarding">
+            <span class="check-item-text"><strong>Safeguarding:</strong> I confirm I have read and understood the safeguarding policy and will follow all safeguarding procedures during my time here.</span>
+          </label>
+          <label class="check-item">
+            <input type="checkbox" id="s-chk-badge">
+            <span class="check-item-text"><strong>Visitor Badge:</strong> I agree to wear my staff/visitor badge visibly at all times and return it when I leave.</span>
+          </label>
+          <label class="check-item">
+            <input type="checkbox" id="s-chk-gdpr">
             <span class="check-item-text"><strong>Data Consent:</strong> I consent to my details being stored securely for safeguarding and security purposes in accordance with UK GDPR.</span>
           </label>
         </div>
         <div class="gdpr-box">
-          <strong>Privacy Notice:</strong> Your name, organisation, host and visit details will be stored securely by City of God Children Department. Data is retained for <strong>12 months</strong> then securely deleted. This is used solely for safeguarding, security and emergency evacuation purposes. You have the right to request access, correction or deletion of your data.
+          <strong>Privacy Notice:</strong> Your sign-in details are stored securely for <strong>12 months</strong> then deleted. Used solely for safeguarding, security and emergency evacuation purposes.
         </div>
         <div class="form-nav">
-          <button class="btn-back" onclick="goStep(2)"><i class="fas fa-arrow-left"></i></button>
-          <button class="btn-submit" id="btn-submit-signin" onclick="submitSignIn()">
-            <span id="submit-label"><i class="fas fa-check"></i> Sign In</span>
-            <div class="spinner" id="submit-spinner"></div>
+          <button class="btn-back" onclick="sGoStep(2)"><i class="fas fa-arrow-left"></i></button>
+          <button class="btn-submit" id="s-btn-submit" onclick="submitStaff()">
+            <span id="s-submit-label"><i class="fas fa-check"></i> Sign In</span>
+            <div class="spinner" id="s-spinner"></div>
           </button>
         </div>
       </div>
-
     </div>
   </div>
 
-  <!-- ═══════════════ BADGE ═══════════════ -->
+  <!-- ═══ BADGE ═══ -->
   <div class="screen" id="screen-badge">
     <div class="badge-body">
       <div class="badge-card">
-        <span class="badge-type">City of God — Visitor</span>
+        <span class="badge-type" id="badge-type-label">Visitor</span>
         <div class="badge-name" id="badge-name">—</div>
-        <div class="badge-org" id="badge-org"></div>
+        <div class="badge-role" id="badge-role"></div>
         <hr class="badge-divider">
+        <div id="badge-children-section" style="display:none;">
+          <div style="font-size:0.75rem;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:0.08em;margin-bottom:6px;">Children</div>
+          <div class="badge-children" id="badge-children-list"></div>
+          <hr class="badge-divider">
+        </div>
         <div class="badge-meta">
           <span><i class="fas fa-user"></i> <span id="badge-host">—</span></span>
           <span><i class="fas fa-tag"></i> <span id="badge-purpose">—</span></span>
           <span><i class="fas fa-clock"></i> <span id="badge-time">—</span></span>
         </div>
-        <div class="badge-number-label" style="margin-top:14px;">Badge Number</div>
+        <div class="badge-number-label" style="margin-top:12px;">Badge Number</div>
         <div class="badge-number" id="badge-number">—</div>
       </div>
       <div class="badge-instruction">
@@ -562,7 +720,7 @@
     </div>
   </div>
 
-  <!-- ═══════════════ SIGN OUT LIST ═══════════════ -->
+  <!-- ═══ SIGN OUT LIST ═══ -->
   <div class="screen" id="screen-signout">
     <div class="signout-body">
       <div class="signout-header">
@@ -570,9 +728,7 @@
           <div class="signout-title"><i class="fas fa-sign-out-alt" style="color:var(--blue);margin-right:8px;"></i>Sign Out</div>
           <div class="signout-sub">Tap your name to sign out</div>
         </div>
-        <button class="btn-back-welcome" onclick="goWelcome()">
-          <i class="fas fa-arrow-left"></i> Back
-        </button>
+        <button class="btn-back-welcome" onclick="goWelcome()"><i class="fas fa-arrow-left"></i> Back</button>
       </div>
       <div id="visitor-list">
         <div class="empty-state"><i class="fas fa-spinner fa-spin"></i> Loading…</div>
@@ -580,7 +736,7 @@
     </div>
   </div>
 
-  <!-- ═══════════════ SIGN OUT CONFIRM ═══════════════ -->
+  <!-- ═══ SIGN OUT CONFIRM ═══ -->
   <div class="screen" id="screen-confirm">
     <div class="confirm-body">
       <div class="confirm-icon"><i class="fas fa-sign-out-alt"></i></div>
@@ -595,25 +751,25 @@
     </div>
   </div>
 
-  <!-- ═══════════════ SIGN OUT SUCCESS ═══════════════ -->
+  <!-- ═══ SIGN OUT SUCCESS ═══ -->
   <div class="screen" id="screen-signout-success">
     <div class="success-body">
       <div class="success-icon"><i class="fas fa-check"></i></div>
       <div class="success-title">Signed Out</div>
-      <div class="success-sub" id="signout-success-msg">Thank you for visiting City of God Children Department!</div>
+      <div class="success-sub" id="signout-success-msg">Thank you for visiting!</div>
       <div class="badge-countdown" id="signout-countdown">Returning to welcome screen in 10s…</div>
     </div>
   </div>
 
 </div>
 
-<!-- TOAST -->
 <div class="toast" id="toast"></div>
 
 <script>
 const SUPABASE_URL      = 'https://roofompdejyndlpqfrjl.supabase.co';
 const SUPABASE_ANON_KEY = 'sb_publishable_Ys9Vq0Akl7BW6VXVVgy65g_MBuXloNO';
 const TABLE             = 'visitor_logs_cityofgod';
+const ORG               = 'City of God Children Department';
 const { createClient }  = supabase;
 const db = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
@@ -627,7 +783,7 @@ const db = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
   setTimeout(tickClock, 1000);
 })();
 
-/* ── Inactivity reset (2 min) ── */
+/* ── Inactivity (2 min) ── */
 let idleTimer;
 function resetIdle() {
   clearTimeout(idleTimer);
@@ -638,131 +794,204 @@ document.addEventListener('mousedown', resetIdle);
 document.addEventListener('keydown', resetIdle);
 resetIdle();
 
-/* ── Screen routing ── */
-function currentScreen() {
-  const s = document.querySelector('.screen.active');
-  return s ? s.id : null;
-}
+/* ── Screens ── */
+function currentScreen() { const s = document.querySelector('.screen.active'); return s ? s.id : null; }
 function showScreen(id) {
   document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
   document.getElementById(id).classList.add('active');
   window.scrollTo(0, 0);
 }
+let badgeCountdownTimer, signoutSuccessTimer;
 function goWelcome() {
   clearTimeout(badgeCountdownTimer);
   clearTimeout(signoutSuccessTimer);
-  resetForm();
+  resetAll();
   showScreen('screen-welcome');
 }
 
-let badgeCountdownTimer;
-let signoutSuccessTimer;
-let currentStep = 1;
-let pendingSignOutId = null;
-
-function resetForm() {
-  ['f-first','f-last','f-org','f-host','f-purpose','f-dbs'].forEach(id => {
-    const el = document.getElementById(id);
-    if (el) el.value = '';
-  });
-  ['chk-safeguarding','chk-badge','chk-gdpr'].forEach(id => {
-    const el = document.getElementById(id);
-    if (el) el.checked = false;
-  });
-  document.getElementById('dbs-section').classList.remove('visible');
-  goToStep(1, false);
+/* ── Reset ── */
+function resetAll() {
+  // parent
+  ['p-first','p-last','p-host','p-purpose'].forEach(id => { const el=document.getElementById(id); if(el) el.value=''; });
+  ['p-chk-safeguarding','p-chk-badge','p-chk-gdpr'].forEach(id => { const el=document.getElementById(id); if(el) el.checked=false; });
+  childCount = 0;
+  document.getElementById('children-list').innerHTML = '';
+  updateAddChildBtn();
+  pCurrentStep = 1;
+  updateProgress('p', 4);
+  document.querySelectorAll('#screen-parent .step-panel').forEach((p,i) => p.classList.toggle('active', i===0));
+  // staff
+  ['s-first','s-last','s-role','s-dbs','s-host'].forEach(id => { const el=document.getElementById(id); if(el) el.value=''; });
+  ['s-chk-safeguarding','s-chk-badge','s-chk-gdpr'].forEach(id => { const el=document.getElementById(id); if(el) el.checked=false; });
+  sCurrentStep = 1;
+  updateProgress('s', 3);
+  document.querySelectorAll('#screen-staff .step-panel').forEach((p,i) => p.classList.toggle('active', i===0));
 }
 
-/* ── Stepper ── */
-function goToStep(n, validate = true) {
-  if (validate) {
-    const err = validateStep(currentStep);
-    if (err) { showToast(err, 'error'); return; }
-  }
-  currentStep = n;
-  document.querySelectorAll('.step-panel').forEach((p, i) => {
-    p.classList.toggle('active', i + 1 === n);
-  });
-  for (let i = 1; i <= 3; i++) {
-    const dot  = document.getElementById(`dot-${i}`);
-    const line = document.getElementById(`line-${i}`);
-    dot.classList.remove('done', 'current');
-    if (i < n)  dot.classList.add('done');
-    if (i === n) dot.classList.add('current');
-    if (line) line.classList.toggle('done', i < n);
+/* ── Progress ── */
+function updateProgress(prefix, total) {
+  const step = prefix === 'p' ? pCurrentStep : sCurrentStep;
+  for (let i = 1; i <= total; i++) {
+    const dot  = document.getElementById(`${prefix}-dot-${i}`);
+    const line = document.getElementById(`${prefix}-line-${i}`);
+    if (!dot) continue;
+    dot.classList.remove('done','current');
+    if (i < step)  dot.classList.add('done');
+    if (i === step) dot.classList.add('current');
+    if (line) line.classList.toggle('done', i < step);
   }
 }
-function goStep(n) { goToStep(n); }
 
-/* ── Validation ── */
-function validateStep(n) {
+/* ══════════════════ PARENT FLOW ══════════════════ */
+let pCurrentStep = 1;
+let childCount = 0;
+const MAX_CHILDREN = 5;
+
+function startParent() { resetAll(); showScreen('screen-parent'); addChild(); }
+
+function pGoStep(n) {
+  const err = pValidateStep(pCurrentStep);
+  if (err) { showToast(err, 'error'); return; }
+  pCurrentStep = n;
+  document.querySelectorAll('#screen-parent .step-panel').forEach((p,i) => p.classList.toggle('active', i+1===n));
+  updateProgress('p', 4);
+}
+
+function pValidateStep(n) {
   if (n === 1) {
-    if (!val('f-first')) return 'Please enter your first name.';
-    if (!val('f-last'))  return 'Please enter your last name.';
+    if (!val('p-first')) return 'Please enter your first name.';
+    if (!val('p-last'))  return 'Please enter your last name.';
   }
   if (n === 2) {
-    if (!val('f-host'))    return 'Please enter the name of the person you are visiting.';
-    if (!val('f-purpose')) return 'Please select a reason for your visit.';
-    const dbsSec = document.getElementById('dbs-section');
-    if (dbsSec.classList.contains('visible') && !val('f-dbs'))
-      return 'Please select your DBS certificate status.';
+    const rows = document.querySelectorAll('#children-list .child-row');
+    if (rows.length === 0) return 'Please add at least one child.';
+    for (const row of rows) {
+      const name = row.querySelector('.child-name');
+      if (!name.value.trim()) return 'Please enter a name for each child.';
+    }
+  }
+  if (n === 3) {
+    if (!val('p-host'))    return 'Please enter who you are here to see.';
+    if (!val('p-purpose')) return 'Please select a reason for your visit.';
   }
   return null;
 }
-function val(id) { return (document.getElementById(id)?.value || '').trim(); }
 
-function onPurposeChange() {
-  const p = val('f-purpose');
-  const showDbs = p === 'Volunteering' || p === 'Contractor / Tradesperson';
-  document.getElementById('dbs-section').classList.toggle('visible', showDbs);
-  if (!showDbs) document.getElementById('f-dbs').value = '';
+function addChild() {
+  if (childCount >= MAX_CHILDREN) return;
+  childCount++;
+  const list = document.getElementById('children-list');
+  const row  = document.createElement('div');
+  row.className = 'child-row';
+  row.dataset.childIndex = childCount;
+  row.innerHTML = `
+    <div class="child-num">${childCount}</div>
+    <div class="child-fields">
+      <input class="child-name" type="text" placeholder="Child's full name" autocomplete="off">
+      <select class="child-year">
+        <option value="">Year group / Age</option>
+        <option>Nursery (3–4)</option>
+        <option>Reception (4–5)</option>
+        <option>Year 1 (5–6)</option>
+        <option>Year 2 (6–7)</option>
+        <option>Year 3 (7–8)</option>
+        <option>Year 4 (8–9)</option>
+        <option>Year 5 (9–10)</option>
+        <option>Year 6 (10–11)</option>
+        <option>Secondary / 11+</option>
+        <option>Other</option>
+      </select>
+    </div>
+    <button class="btn-remove-child" onclick="removeChild(this)" title="Remove"><i class="fas fa-times"></i></button>
+  `;
+  list.appendChild(row);
+  updateAddChildBtn();
+  row.querySelector('.child-name').focus();
 }
 
-/* ── SIGN IN ── */
-function startSignIn() { resetForm(); showScreen('screen-signin'); }
+function removeChild(btn) {
+  btn.closest('.child-row').remove();
+  childCount--;
+  // Re-number
+  document.querySelectorAll('#children-list .child-row').forEach((row, i) => {
+    row.querySelector('.child-num').textContent = i + 1;
+  });
+  updateAddChildBtn();
+}
 
-async function submitSignIn() {
-  if (!document.getElementById('chk-safeguarding').checked)
+function updateAddChildBtn() {
+  const btn  = document.getElementById('btn-add-child');
+  const note = document.getElementById('child-count-note');
+  btn.disabled = childCount >= MAX_CHILDREN;
+  const current = document.querySelectorAll('#children-list .child-row').length;
+  note.textContent = current > 0
+    ? `${current} child${current > 1 ? 'ren' : ''} added${childCount >= MAX_CHILDREN ? ' (maximum reached)' : ''}`
+    : '';
+}
+
+function getChildren() {
+  return Array.from(document.querySelectorAll('#children-list .child-row')).map(row => ({
+    name:       row.querySelector('.child-name').value.trim(),
+    year_group: row.querySelector('.child-year').value || 'Not specified'
+  }));
+}
+
+async function submitParent() {
+  if (!document.getElementById('p-chk-safeguarding').checked)
     return showToast('Please confirm you have read the safeguarding information.', 'error');
-  if (!document.getElementById('chk-badge').checked)
+  if (!document.getElementById('p-chk-badge').checked)
     return showToast('Please confirm you will wear a visitor badge.', 'error');
-  if (!document.getElementById('chk-gdpr').checked)
+  if (!document.getElementById('p-chk-gdpr').checked)
     return showToast('Please consent to data storage to proceed.', 'error');
 
-  const btn     = document.getElementById('btn-submit-signin');
-  const label   = document.getElementById('submit-label');
-  const spinner = document.getElementById('submit-spinner');
-  btn.disabled  = true;
-  label.style.display   = 'none';
-  spinner.style.display = 'block';
+  const btn = document.getElementById('p-btn-submit');
+  const lbl = document.getElementById('p-submit-label');
+  const spn = document.getElementById('p-spinner');
+  btn.disabled = true; lbl.style.display = 'none'; spn.style.display = 'block';
 
-  const purpose   = val('f-purpose');
-  const dbsStatus = val('f-dbs') || 'N/A';
-  const badgeId   = generateBadgeId();
-  const now       = new Date();
+  const children = getChildren();
+  const badgeId  = generateBadgeId();
+  const now      = new Date();
 
   const record = {
-    first_name:   val('f-first'),
-    last_name:    val('f-last'),
-    organisation: val('f-org') || null,
-    host_name:    val('f-host'),
-    purpose,
-    dbs_status:   dbsStatus,
+    first_name:   val('p-first'),
+    last_name:    val('p-last'),
+    organisation: ORG,
+    host_name:    val('p-host'),
+    purpose:      val('p-purpose'),
+    dbs_status:   'N/A',
     badge_id:     badgeId,
     signed_in_at: now.toISOString(),
+    visitor_type: 'parent',
+    children:     children,
+    staff_role:   null
   };
 
   try {
     const { error } = await db.from(TABLE).insert(record);
     if (error) throw error;
 
-    document.getElementById('badge-name').textContent    = `${record.first_name} ${record.last_name}`;
-    document.getElementById('badge-org').textContent     = record.organisation || '';
-    document.getElementById('badge-host').textContent    = record.host_name;
-    document.getElementById('badge-purpose').textContent = record.purpose;
-    document.getElementById('badge-time').textContent    =
+    // Badge
+    document.getElementById('badge-type-label').textContent = 'Parent / Guardian';
+    document.getElementById('badge-type-label').className   = 'badge-type';
+    document.getElementById('badge-name').textContent       = `${record.first_name} ${record.last_name}`;
+    document.getElementById('badge-role').textContent       = '';
+    document.getElementById('badge-host').textContent       = record.host_name;
+    document.getElementById('badge-purpose').textContent    = record.purpose;
+    document.getElementById('badge-time').textContent       =
       now.toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit' });
-    document.getElementById('badge-number').textContent  = badgeId;
+    document.getElementById('badge-number').textContent     = badgeId;
+
+    const childSec  = document.getElementById('badge-children-section');
+    const childList = document.getElementById('badge-children-list');
+    if (children.length > 0) {
+      childSec.style.display = 'block';
+      childList.innerHTML = children.map(c =>
+        `<div class="badge-child-row"><i class="fas fa-child"></i><span>${c.name}${c.year_group && c.year_group !== 'Not specified' ? ' <small style="color:var(--muted)">(' + c.year_group + ')</small>' : ''}</span></div>`
+      ).join('');
+    } else {
+      childSec.style.display = 'none';
+    }
 
     showScreen('screen-badge');
     startBadgeCountdown();
@@ -770,31 +999,94 @@ async function submitSignIn() {
     console.error(e);
     showToast('Could not save sign-in. Please try again or see reception.', 'error');
   } finally {
-    btn.disabled = false;
-    label.style.display   = 'inline';
-    spinner.style.display = 'none';
+    btn.disabled = false; lbl.style.display = 'inline'; spn.style.display = 'none';
   }
 }
 
-function startBadgeCountdown() {
-  let secs = 30;
-  const el = document.getElementById('badge-countdown');
-  function tick() {
-    el.textContent = `Returning to welcome screen in ${secs}s…`;
-    if (--secs < 0) { goWelcome(); return; }
-    badgeCountdownTimer = setTimeout(tick, 1000);
+/* ══════════════════ STAFF FLOW ══════════════════ */
+let sCurrentStep = 1;
+
+function startStaff() { resetAll(); showScreen('screen-staff'); }
+
+function sGoStep(n) {
+  const err = sValidateStep(sCurrentStep);
+  if (err) { showToast(err, 'error'); return; }
+  sCurrentStep = n;
+  document.querySelectorAll('#screen-staff .step-panel').forEach((p,i) => p.classList.toggle('active', i+1===n));
+  updateProgress('s', 3);
+}
+
+function sValidateStep(n) {
+  if (n === 1) {
+    if (!val('s-first')) return 'Please enter your first name.';
+    if (!val('s-last'))  return 'Please enter your last name.';
+    if (!val('s-role'))  return 'Please select your role.';
   }
-  tick();
+  if (n === 2) {
+    if (!val('s-dbs'))  return 'Please select your DBS certificate status.';
+    if (!val('s-host')) return 'Please enter who you are reporting to.';
+  }
+  return null;
 }
 
-function generateBadgeId() {
-  const chars = 'ABCDEFGHJKMNPQRSTUVWXYZ23456789';
-  let id = 'CG';
-  for (let i = 0; i < 3; i++) id += chars[Math.floor(Math.random() * chars.length)];
-  return id;
+async function submitStaff() {
+  if (!document.getElementById('s-chk-safeguarding').checked)
+    return showToast('Please confirm you have read the safeguarding policy.', 'error');
+  if (!document.getElementById('s-chk-badge').checked)
+    return showToast('Please confirm you will wear your badge.', 'error');
+  if (!document.getElementById('s-chk-gdpr').checked)
+    return showToast('Please consent to data storage to proceed.', 'error');
+
+  const btn = document.getElementById('s-btn-submit');
+  const lbl = document.getElementById('s-submit-label');
+  const spn = document.getElementById('s-spinner');
+  btn.disabled = true; lbl.style.display = 'none'; spn.style.display = 'block';
+
+  const badgeId = generateBadgeId();
+  const now     = new Date();
+
+  const record = {
+    first_name:   val('s-first'),
+    last_name:    val('s-last'),
+    organisation: ORG,
+    host_name:    val('s-host'),
+    purpose:      val('s-role'),
+    dbs_status:   val('s-dbs'),
+    badge_id:     badgeId,
+    signed_in_at: now.toISOString(),
+    visitor_type: 'staff',
+    children:     null,
+    staff_role:   val('s-role')
+  };
+
+  try {
+    const { error } = await db.from(TABLE).insert(record);
+    if (error) throw error;
+
+    document.getElementById('badge-type-label').textContent = 'Staff / Teacher';
+    document.getElementById('badge-type-label').className   = 'badge-type staff-type';
+    document.getElementById('badge-name').textContent       = `${record.first_name} ${record.last_name}`;
+    document.getElementById('badge-role').textContent       = record.staff_role;
+    document.getElementById('badge-host').textContent       = record.host_name;
+    document.getElementById('badge-purpose').textContent    = record.staff_role;
+    document.getElementById('badge-time').textContent       =
+      now.toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit' });
+    document.getElementById('badge-number').textContent     = badgeId;
+    document.getElementById('badge-children-section').style.display = 'none';
+
+    showScreen('screen-badge');
+    startBadgeCountdown();
+  } catch (e) {
+    console.error(e);
+    showToast('Could not save sign-in. Please try again or see reception.', 'error');
+  } finally {
+    btn.disabled = false; lbl.style.display = 'inline'; spn.style.display = 'none';
+  }
 }
 
-/* ── SIGN OUT ── */
+/* ══════════════════ SIGN OUT ══════════════════ */
+let pendingSignOutId = null;
+
 async function startSignOut() {
   showScreen('screen-signout');
   await loadTodayVisitors();
@@ -807,7 +1099,7 @@ async function loadTodayVisitors() {
   try {
     const { data, error } = await db
       .from(TABLE)
-      .select('id, first_name, last_name, organisation, host_name, purpose, signed_in_at')
+      .select('id, first_name, last_name, host_name, purpose, visitor_type, staff_role, children, signed_in_at')
       .gte('signed_in_at', `${today}T00:00:00`)
       .lte('signed_in_at', `${today}T23:59:59`)
       .is('signed_out_at', null)
@@ -815,23 +1107,37 @@ async function loadTodayVisitors() {
     if (error) throw error;
 
     if (!data || data.length === 0) {
-      listEl.innerHTML = '<div class="empty-state"><i class="fas fa-users"></i><div>No visitors currently signed in</div></div>';
+      listEl.innerHTML = '<div class="empty-state"><i class="fas fa-users"></i><div>No one currently signed in</div></div>';
       return;
     }
-    listEl.innerHTML = data.map(v => `
-      <div class="visitor-card" onclick="promptSignOut('${v.id}','${v.first_name} ${v.last_name}','${v.host_name}','${v.purpose}','${v.signed_in_at}')">
-        <div class="visitor-card-info">
-          <div class="visitor-card-name">${v.first_name} ${v.last_name}</div>
-          <div class="visitor-card-meta">Visiting ${v.host_name} · ${v.purpose}${v.organisation ? ' · ' + v.organisation : ''}</div>
-        </div>
-        <div class="visitor-card-time">${formatTime(v.signed_in_at)}<small>signed in</small></div>
-      </div>
-    `).join('');
+    listEl.innerHTML = data.map(v => {
+      const isParent   = v.visitor_type === 'parent';
+      const badgeCls   = isParent ? 'badge-parent' : 'badge-staff';
+      const badgeLbl   = isParent ? 'Parent' : 'Staff';
+      const childNames = isParent && v.children && v.children.length
+        ? ' · ' + v.children.map(c => c.name).join(', ')
+        : '';
+      const meta = isParent
+        ? `Visiting ${v.host_name} · ${v.purpose}${childNames}`
+        : `${v.staff_role || v.purpose} · Reporting to ${v.host_name}`;
+      return `
+        <div class="visitor-card" onclick="promptSignOut('${v.id}','${escHtml(v.first_name + ' ' + v.last_name)}','${escHtml(v.host_name)}','${escHtml(v.purpose)}','${v.signed_in_at}')">
+          <div class="visitor-card-info">
+            <div class="visitor-card-name">
+              <span class="visitor-card-badge ${badgeCls}">${badgeLbl}</span>${v.first_name} ${v.last_name}
+            </div>
+            <div class="visitor-card-meta">${meta}</div>
+          </div>
+          <div class="visitor-card-time">${formatTime(v.signed_in_at)}<small>signed in</small></div>
+        </div>`;
+    }).join('');
   } catch (e) {
     console.error(e);
-    listEl.innerHTML = '<div class="empty-state"><i class="fas fa-exclamation-triangle" style="color:var(--red)"></i><div>Could not load visitors. Please try again.</div></div>';
+    listEl.innerHTML = '<div class="empty-state"><i class="fas fa-exclamation-triangle" style="color:var(--red)"></i><div>Could not load. Please try again.</div></div>';
   }
 }
+
+function escHtml(str) { return (str || '').replace(/'/g, '&#39;'); }
 
 function formatTime(iso) {
   return new Date(iso).toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit' });
@@ -878,6 +1184,27 @@ async function confirmSignOut() {
     pendingSignOutId = null;
   }
 }
+
+/* ── Badge countdown ── */
+function startBadgeCountdown() {
+  let secs = 30;
+  const el = document.getElementById('badge-countdown');
+  function tick() {
+    el.textContent = `Returning to welcome screen in ${secs}s…`;
+    if (--secs < 0) { goWelcome(); return; }
+    badgeCountdownTimer = setTimeout(tick, 1000);
+  }
+  tick();
+}
+
+function generateBadgeId() {
+  const chars = 'ABCDEFGHJKMNPQRSTUVWXYZ23456789';
+  let id = 'CG';
+  for (let i = 0; i < 3; i++) id += chars[Math.floor(Math.random() * chars.length)];
+  return id;
+}
+
+function val(id) { return (document.getElementById(id)?.value || '').trim(); }
 
 /* ── Toast ── */
 let toastTimer;
