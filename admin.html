@@ -1,0 +1,601 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Admin — City of God Children Sign In</title>
+  <link rel="icon" type="image/png" href="logo.png">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+  <style>
+    :root {
+      --blue:   #1a3f8f;
+      --blue-d: #0f2660;
+      --gold:   #f59e0b;
+    }
+    body { background: #f1f4fb; font-family: 'Segoe UI', system-ui, sans-serif; }
+
+    /* ── SIDEBAR ── */
+    .sidebar {
+      width: 230px; min-height: 100vh; background: var(--blue-d);
+      position: fixed; top: 0; left: 0; z-index: 100;
+      display: flex; flex-direction: column;
+    }
+    .sidebar-brand {
+      padding: 20px 18px 16px;
+      border-bottom: 1px solid rgba(255,255,255,0.1);
+    }
+    .sidebar-brand img { height: 36px; width: auto; margin-bottom: 8px; display: block; }
+    .sidebar-brand-sub { color: rgba(255,255,255,0.55); font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.1em; }
+    .sidebar-nav { padding: 16px 0; flex: 1; }
+    .sidebar-label { color: rgba(255,255,255,0.35); font-size: 0.65rem; text-transform: uppercase; letter-spacing: 0.12em; padding: 12px 18px 4px; }
+    .sidebar-link {
+      display: flex; align-items: center; gap: 10px;
+      padding: 10px 18px; color: rgba(255,255,255,0.75);
+      font-size: 0.9rem; text-decoration: none; transition: all 0.15s;
+      border-left: 3px solid transparent;
+    }
+    .sidebar-link:hover, .sidebar-link.active {
+      background: rgba(255,255,255,0.08); color: #fff;
+      border-left-color: var(--gold);
+    }
+    .sidebar-link i { width: 18px; text-align: center; }
+    .sidebar-footer {
+      padding: 14px 18px; border-top: 1px solid rgba(255,255,255,0.1);
+    }
+    .btn-logout {
+      background: transparent; border: 1px solid rgba(255,255,255,0.2);
+      color: rgba(255,255,255,0.6); font-size: 0.82rem; padding: 8px 14px;
+      border-radius: 8px; cursor: pointer; width: 100%; text-align: left;
+      display: flex; align-items: center; gap: 8px;
+    }
+    .btn-logout:hover { background: rgba(255,255,255,0.08); color: #fff; }
+
+    /* ── MAIN ── */
+    .main { margin-left: 230px; padding: 28px 28px 40px; }
+    .page-title { font-size: 1.4rem; font-weight: 800; color: var(--blue-d); }
+    .page-sub   { font-size: 0.85rem; color: #6b7280; margin-top: 2px; }
+
+    /* ── STAT CARDS ── */
+    .stat-card {
+      background: #fff; border-radius: 14px;
+      padding: 20px 22px; border: 1px solid #e5e9f4;
+      box-shadow: 0 2px 10px rgba(26,63,143,0.06);
+    }
+    .stat-card .stat-label { font-size: 0.78rem; color: #6b7280; font-weight: 600; text-transform: uppercase; letter-spacing: 0.06em; }
+    .stat-card .stat-value { font-size: 2rem; font-weight: 800; color: var(--blue-d); line-height: 1.1; margin-top: 4px; }
+    .stat-card .stat-icon  { font-size: 1.4rem; opacity: 0.15; float: right; margin-top: -32px; color: var(--blue); }
+
+    /* ── FILTER BAR ── */
+    .filter-bar {
+      background: #fff; border-radius: 12px; padding: 16px 20px;
+      border: 1px solid #e5e9f4; display: flex; gap: 12px; flex-wrap: wrap; align-items: flex-end;
+    }
+    .filter-bar label { font-size: 0.78rem; font-weight: 600; color: #374151; display: block; margin-bottom: 4px; }
+    .filter-bar input, .filter-bar select {
+      border: 1.5px solid #dde3f0; border-radius: 8px; padding: 8px 12px;
+      font-size: 0.88rem; background: #fff; color: #1a1a1a; outline: none;
+    }
+    .filter-bar input:focus, .filter-bar select:focus { border-color: var(--blue); }
+    .btn-load {
+      background: var(--blue); color: #fff; border: none;
+      border-radius: 8px; padding: 9px 18px; font-size: 0.88rem;
+      font-weight: 600; cursor: pointer; display: flex; align-items: center; gap: 6px;
+    }
+    .btn-load:hover { background: var(--blue-d); }
+
+    /* ── TABLE CARD ── */
+    .table-card {
+      background: #fff; border-radius: 14px; border: 1px solid #e5e9f4;
+      box-shadow: 0 2px 10px rgba(26,63,143,0.06); overflow: hidden;
+    }
+    .table-card-header {
+      padding: 16px 20px; border-bottom: 1px solid #f0f2f8;
+      display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap;
+    }
+    .table-card-title { font-weight: 700; color: var(--blue-d); font-size: 1rem; }
+    .table-actions { display: flex; gap: 8px; }
+    .btn-export {
+      background: #f0f4ff; color: var(--blue); border: 1px solid #c7d7fd;
+      border-radius: 8px; padding: 7px 14px; font-size: 0.82rem; font-weight: 600;
+      cursor: pointer; display: flex; align-items: center; gap: 6px;
+    }
+    .btn-export:hover { background: var(--blue); color: #fff; border-color: var(--blue); }
+    .btn-print {
+      background: #f0f9f4; color: #166534; border: 1px solid #bbf7d0;
+      border-radius: 8px; padding: 7px 14px; font-size: 0.82rem; font-weight: 600;
+      cursor: pointer; display: flex; align-items: center; gap: 6px;
+    }
+    .btn-print:hover { background: #166534; color: #fff; border-color: #166534; }
+
+    .search-input {
+      border: 1.5px solid #dde3f0; border-radius: 8px; padding: 7px 12px;
+      font-size: 0.85rem; outline: none; min-width: 200px;
+    }
+    .search-input:focus { border-color: var(--blue); }
+
+    table { width: 100%; border-collapse: collapse; font-size: 0.85rem; }
+    thead th {
+      background: #f8faff; color: #374151; font-weight: 700;
+      padding: 11px 14px; text-align: left; font-size: 0.78rem;
+      text-transform: uppercase; letter-spacing: 0.05em;
+      border-bottom: 1px solid #e5e9f4;
+    }
+    tbody tr { border-bottom: 1px solid #f0f2f8; transition: background 0.1s; }
+    tbody tr:hover { background: #f8faff; }
+    tbody td { padding: 12px 14px; vertical-align: middle; color: #374151; }
+    tbody tr:last-child { border-bottom: none; }
+
+    .badge-type {
+      display: inline-block; padding: 3px 10px; border-radius: 20px;
+      font-size: 0.72rem; font-weight: 700;
+    }
+    .badge-parent { background: #dbeafe; color: #1e40af; }
+    .badge-staff  { background: #fef3c7; color: #92400e; }
+    .badge-in     { background: #d1fae5; color: #065f46; }
+    .badge-out    { background: #f3f4f6; color: #6b7280; }
+
+    .children-list { font-size: 0.78rem; color: #6b7280; margin-top: 2px; }
+    .duration { font-size: 0.78rem; color: #9ca3af; }
+
+    .btn-signout-admin {
+      background: #fee2e2; color: #dc2626; border: none;
+      border-radius: 6px; padding: 5px 10px; font-size: 0.75rem;
+      font-weight: 600; cursor: pointer;
+    }
+    .btn-signout-admin:hover { background: #dc2626; color: #fff; }
+    .btn-delete-admin {
+      background: transparent; color: #9ca3af; border: none;
+      border-radius: 6px; padding: 5px 8px; font-size: 0.75rem; cursor: pointer;
+    }
+    .btn-delete-admin:hover { color: #dc2626; }
+
+    .empty-row td { text-align: center; padding: 40px; color: #9ca3af; }
+
+    /* ── LOGIN ── */
+    #login-screen {
+      display: flex; align-items: center; justify-content: center;
+      min-height: 100vh; background: var(--blue-d);
+    }
+    .login-card {
+      background: #fff; border-radius: 20px; padding: 40px 36px;
+      width: 100%; max-width: 380px; text-align: center;
+      box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+    }
+    .login-card img { height: 50px; width: auto; margin-bottom: 16px; }
+    .login-card h2 { font-size: 1.3rem; font-weight: 800; color: var(--blue-d); margin-bottom: 4px; }
+    .login-card p  { font-size: 0.85rem; color: #6b7280; margin-bottom: 24px; }
+    .login-input {
+      width: 100%; padding: 13px 16px; border: 1.5px solid #dde3f0;
+      border-radius: 10px; font-size: 1rem; outline: none; margin-bottom: 14px;
+    }
+    .login-input:focus { border-color: var(--blue); }
+    .btn-login {
+      width: 100%; padding: 13px; background: var(--blue); border: none;
+      border-radius: 10px; font-size: 1rem; font-weight: 700;
+      color: #fff; cursor: pointer;
+    }
+    .btn-login:hover { background: var(--blue-d); }
+    .login-error { color: #dc2626; font-size: 0.85rem; margin-top: 10px; display: none; }
+
+    #admin-screen { display: none; }
+
+    /* ── PRINT ── */
+    @media print {
+      .sidebar, .filter-bar, .table-actions, .btn-signout-admin, .btn-delete-admin,
+      #login-screen { display: none !important; }
+      .main { margin-left: 0; padding: 0; }
+      .table-card { box-shadow: none; border: 1px solid #ccc; }
+    }
+
+    @media (max-width: 768px) {
+      .sidebar { display: none; }
+      .main { margin-left: 0; padding: 16px; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- ═══ LOGIN ═══ -->
+<div id="login-screen">
+  <div class="login-card">
+    <img src="logo.png" alt="City of God">
+    <h2>Admin Login</h2>
+    <p>City of God Children Sign In System</p>
+    <input type="password" class="login-input" id="login-password" placeholder="Enter admin password" onkeydown="if(event.key==='Enter') doLogin()">
+    <button class="btn-login" onclick="doLogin()"><i class="fas fa-sign-in-alt"></i> Log In</button>
+    <div class="login-error" id="login-error"></div>
+  </div>
+</div>
+
+<!-- ═══ ADMIN ═══ -->
+<div id="admin-screen">
+  <!-- SIDEBAR -->
+  <div class="sidebar">
+    <div class="sidebar-brand">
+      <img src="logo.png" alt="City of God">
+      <div class="sidebar-brand-sub">Admin Panel</div>
+    </div>
+    <nav class="sidebar-nav">
+      <div class="sidebar-label">Reports</div>
+      <a href="#" class="sidebar-link active" onclick="return false;">
+        <i class="fas fa-chart-bar"></i> Daily Report
+      </a>
+      <a href="index.html" class="sidebar-link" target="_blank">
+        <i class="fas fa-tablet-alt"></i> Open Kiosk
+      </a>
+    </nav>
+    <div class="sidebar-footer">
+      <button class="btn-logout" onclick="doLogout()">
+        <i class="fas fa-sign-out-alt"></i> Log Out
+      </button>
+    </div>
+  </div>
+
+  <!-- MAIN -->
+  <div class="main">
+    <div class="d-flex align-items-start justify-content-between mb-4">
+      <div>
+        <div class="page-title"><i class="fas fa-chart-bar" style="color:var(--blue);margin-right:8px;"></i>Daily Sign In Report</div>
+        <div class="page-sub" id="report-date-label">Today's report</div>
+      </div>
+    </div>
+
+    <!-- STAT CARDS -->
+    <div class="row g-3 mb-4">
+      <div class="col-6 col-md-3">
+        <div class="stat-card">
+          <div class="stat-label">Total Signed In</div>
+          <div class="stat-value" id="stat-total">—</div>
+          <i class="fas fa-users stat-icon"></i>
+        </div>
+      </div>
+      <div class="col-6 col-md-3">
+        <div class="stat-card">
+          <div class="stat-label">Currently Inside</div>
+          <div class="stat-value" id="stat-inside">—</div>
+          <i class="fas fa-door-open stat-icon"></i>
+        </div>
+      </div>
+      <div class="col-6 col-md-3">
+        <div class="stat-card">
+          <div class="stat-label">Parents</div>
+          <div class="stat-value" id="stat-parents">—</div>
+          <i class="fas fa-people-group stat-icon"></i>
+        </div>
+      </div>
+      <div class="col-6 col-md-3">
+        <div class="stat-card">
+          <div class="stat-label">Staff / Teachers</div>
+          <div class="stat-value" id="stat-staff">—</div>
+          <i class="fas fa-chalkboard-teacher stat-icon"></i>
+        </div>
+      </div>
+    </div>
+
+    <!-- CHILDREN STAT -->
+    <div class="row g-3 mb-4">
+      <div class="col-6 col-md-3">
+        <div class="stat-card">
+          <div class="stat-label">Children Signed In</div>
+          <div class="stat-value" id="stat-children">—</div>
+          <i class="fas fa-child stat-icon"></i>
+        </div>
+      </div>
+      <div class="col-6 col-md-3">
+        <div class="stat-card">
+          <div class="stat-label">Signed Out</div>
+          <div class="stat-value" id="stat-signedout">—</div>
+          <i class="fas fa-sign-out-alt stat-icon"></i>
+        </div>
+      </div>
+    </div>
+
+    <!-- FILTER BAR -->
+    <div class="filter-bar mb-4">
+      <div>
+        <label>From</label>
+        <input type="date" id="filter-from">
+      </div>
+      <div>
+        <label>To</label>
+        <input type="date" id="filter-to">
+      </div>
+      <div>
+        <label>Type</label>
+        <select id="filter-type">
+          <option value="">All</option>
+          <option value="parent">Parents</option>
+          <option value="staff">Staff / Teachers</option>
+        </select>
+      </div>
+      <button class="btn-load" onclick="loadReport()">
+        <i class="fas fa-search"></i> Load Report
+      </button>
+      <button class="btn-load" style="background:#6b7280;" onclick="loadToday()">
+        <i class="fas fa-calendar-day"></i> Today
+      </button>
+    </div>
+
+    <!-- TABLE -->
+    <div class="table-card">
+      <div class="table-card-header">
+        <div class="table-card-title" id="table-title">Sign In Log</div>
+        <div class="table-actions">
+          <input type="text" class="search-input" id="search-input" placeholder="Search by name…" oninput="filterTable()">
+          <button class="btn-export" onclick="exportCSV()"><i class="fas fa-file-csv"></i> Export CSV</button>
+          <button class="btn-print" onclick="window.print()"><i class="fas fa-print"></i> Print</button>
+        </div>
+      </div>
+      <div style="overflow-x:auto;">
+        <table id="main-table">
+          <thead>
+            <tr>
+              <th>Type</th>
+              <th>Name</th>
+              <th>Children / Role</th>
+              <th>DBS</th>
+              <th>Signed In</th>
+              <th>Signed Out</th>
+              <th>Duration</th>
+              <th>Status</th>
+              <th></th>
+            </tr>
+          </thead>
+          <tbody id="table-body">
+            <tr class="empty-row"><td colspan="9"><i class="fas fa-calendar-day" style="font-size:1.8rem;opacity:0.2;display:block;margin-bottom:8px;"></i>Select a date and click Load Report</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+const API = '/api/admin';
+let sessionToken = null;
+let allRows      = [];
+
+/* ── AUTH ── */
+async function doLogin() {
+  const pw  = document.getElementById('login-password').value;
+  const err = document.getElementById('login-error');
+  err.style.display = 'none';
+  try {
+    const r = await fetch(API, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ action: 'login', password: pw })
+    });
+    const d = await r.json();
+    if (!r.ok) { err.textContent = d.error; err.style.display = 'block'; return; }
+    sessionToken = d.token;
+    sessionStorage.setItem('cog_admin_token', sessionToken);
+    showAdmin();
+  } catch (e) {
+    err.textContent = 'Could not connect. Please try again.';
+    err.style.display = 'block';
+  }
+}
+
+function doLogout() {
+  sessionStorage.removeItem('cog_admin_token');
+  sessionToken = null;
+  document.getElementById('admin-screen').style.display = 'none';
+  document.getElementById('login-screen').style.display = 'flex';
+  document.getElementById('login-password').value = '';
+}
+
+function showAdmin() {
+  document.getElementById('login-screen').style.display  = 'none';
+  document.getElementById('admin-screen').style.display  = 'block';
+  loadToday();
+}
+
+/* ── DATE HELPERS ── */
+function today() { return new Date().toISOString().slice(0, 10); }
+function fmtDate(iso) {
+  if (!iso) return '—';
+  return new Date(iso).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' });
+}
+function fmtTime(iso) {
+  if (!iso) return '—';
+  return new Date(iso).toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit' });
+}
+function duration(inIso, outIso) {
+  if (!outIso) return '—';
+  const mins = Math.round((new Date(outIso) - new Date(inIso)) / 60000);
+  if (mins < 60) return `${mins}m`;
+  return `${Math.floor(mins/60)}h ${mins%60}m`;
+}
+
+function loadToday() {
+  const t = today();
+  document.getElementById('filter-from').value = t;
+  document.getElementById('filter-to').value   = t;
+  document.getElementById('filter-type').value = '';
+  loadReport();
+}
+
+/* ── LOAD REPORT ── */
+async function loadReport() {
+  const from = document.getElementById('filter-from').value || today();
+  const to   = document.getElementById('filter-to').value   || from;
+  const type = document.getElementById('filter-type').value;
+
+  document.getElementById('table-body').innerHTML =
+    '<tr class="empty-row"><td colspan="9"><i class="fas fa-spinner fa-spin"></i> Loading…</td></tr>';
+
+  const label = from === to
+    ? `Report for ${fmtDate(from + 'T00:00:00')}`
+    : `Report: ${fmtDate(from + 'T00:00:00')} — ${fmtDate(to + 'T00:00:00')}`;
+  document.getElementById('report-date-label').textContent = label;
+  document.getElementById('table-title').textContent = label;
+
+  try {
+    const r = await fetch(API, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${sessionToken}` },
+      body: JSON.stringify({ action: 'list', date_from: from, date_to: to })
+    });
+    if (r.status === 401) { doLogout(); return; }
+    let data = await r.json();
+    if (!Array.isArray(data)) throw new Error('Bad response');
+    if (type) data = data.filter(v => v.visitor_type === type);
+    allRows = data;
+    renderTable(data);
+    updateStats(data);
+  } catch (e) {
+    document.getElementById('table-body').innerHTML =
+      '<tr class="empty-row"><td colspan="9"><i class="fas fa-exclamation-triangle" style="color:#dc2626"></i> Could not load data. Please try again.</td></tr>';
+  }
+}
+
+/* ── RENDER TABLE ── */
+function renderTable(data) {
+  const tbody = document.getElementById('table-body');
+  if (!data || data.length === 0) {
+    tbody.innerHTML = '<tr class="empty-row"><td colspan="9"><i class="fas fa-inbox" style="font-size:1.8rem;opacity:0.2;display:block;margin-bottom:8px;"></i>No records found for this period</td></tr>';
+    return;
+  }
+  tbody.innerHTML = data.map(v => {
+    const isParent  = v.visitor_type === 'parent';
+    const typeBadge = isParent ? '<span class="badge-type badge-parent">Parent</span>' : '<span class="badge-type badge-staff">Staff</span>';
+    const name      = `<strong>${v.first_name} ${v.last_name}</strong>`;
+    const dbsShow   = (!isParent && v.dbs_status && v.dbs_status !== 'N/A') ? v.dbs_status : '—';
+
+    let childrenOrRole = '—';
+    if (isParent && v.children && v.children.length) {
+      childrenOrRole = v.children.map(c =>
+        `<div>${c.name} <span style="color:#9ca3af;font-size:0.75rem;">${c.year_group || ''}</span></div>`
+      ).join('');
+    } else if (!isParent && v.staff_role) {
+      childrenOrRole = `<span style="color:#92400e;font-weight:600;">${v.staff_role}</span>`;
+    }
+
+    const isIn     = !v.signed_out_at;
+    const status   = isIn
+      ? '<span class="badge-type badge-in">Inside</span>'
+      : '<span class="badge-type badge-out">Signed Out</span>';
+    const actions  = isIn
+      ? `<button class="btn-signout-admin" onclick="adminSignOut('${v.id}')"><i class="fas fa-sign-out-alt"></i> Sign Out</button>`
+      : `<button class="btn-delete-admin" onclick="adminDelete('${v.id}')" title="Delete"><i class="fas fa-trash"></i></button>`;
+
+    return `<tr data-id="${v.id}" data-name="${v.first_name} ${v.last_name}">
+      <td>${typeBadge}</td>
+      <td>${name}</td>
+      <td><div class="children-list">${childrenOrRole}</div></td>
+      <td style="font-size:0.78rem;">${dbsShow}</td>
+      <td>${fmtTime(v.signed_in_at)}</td>
+      <td>${fmtTime(v.signed_out_at)}</td>
+      <td><span class="duration">${duration(v.signed_in_at, v.signed_out_at)}</span></td>
+      <td>${status}</td>
+      <td>${actions}</td>
+    </tr>`;
+  }).join('');
+}
+
+/* ── STATS ── */
+function updateStats(data) {
+  const parents  = data.filter(v => v.visitor_type === 'parent');
+  const staff    = data.filter(v => v.visitor_type === 'staff');
+  const inside   = data.filter(v => !v.signed_out_at);
+  const signedOut = data.filter(v => !!v.signed_out_at);
+  const childTotal = parents.reduce((sum, v) => sum + ((v.children || []).length), 0);
+
+  document.getElementById('stat-total').textContent    = data.length;
+  document.getElementById('stat-inside').textContent   = inside.length;
+  document.getElementById('stat-parents').textContent  = parents.length;
+  document.getElementById('stat-staff').textContent    = staff.length;
+  document.getElementById('stat-children').textContent = childTotal;
+  document.getElementById('stat-signedout').textContent = signedOut.length;
+}
+
+/* ── SEARCH FILTER ── */
+function filterTable() {
+  const q = document.getElementById('search-input').value.toLowerCase();
+  const filtered = allRows.filter(v =>
+    `${v.first_name} ${v.last_name}`.toLowerCase().includes(q) ||
+    (v.children || []).some(c => c.name.toLowerCase().includes(q))
+  );
+  renderTable(filtered);
+}
+
+/* ── ADMIN SIGN OUT ── */
+async function adminSignOut(id) {
+  if (!confirm('Sign this person out?')) return;
+  try {
+    const r = await fetch(API, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${sessionToken}` },
+      body: JSON.stringify({ action: 'signout', id })
+    });
+    if (r.ok) loadReport();
+    else alert('Could not sign out. Please try again.');
+  } catch { alert('Network error.'); }
+}
+
+/* ── DELETE ── */
+async function adminDelete(id) {
+  if (!confirm('Delete this record permanently?')) return;
+  try {
+    const r = await fetch(API, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${sessionToken}` },
+      body: JSON.stringify({ action: 'delete', id })
+    });
+    if (r.ok) loadReport();
+    else alert('Could not delete record.');
+  } catch { alert('Network error.'); }
+}
+
+/* ── EXPORT CSV ── */
+function exportCSV() {
+  if (!allRows.length) return alert('No data to export.');
+  const from = document.getElementById('filter-from').value || today();
+  const to   = document.getElementById('filter-to').value   || from;
+
+  const headers = ['Type','First Name','Last Name','Children / Groups','Staff Role','DBS Status','Signed In','Signed Out','Duration','Status'];
+  const rows = allRows.map(v => {
+    const isParent = v.visitor_type === 'parent';
+    const children = isParent && v.children
+      ? v.children.map(c => `${c.name} (${c.year_group || ''})`).join(' | ')
+      : '';
+    const dur = duration(v.signed_in_at, v.signed_out_at);
+    return [
+      isParent ? 'Parent' : 'Staff',
+      v.first_name,
+      v.last_name,
+      children,
+      v.staff_role || '',
+      v.dbs_status || '',
+      fmtTime(v.signed_in_at),
+      fmtTime(v.signed_out_at),
+      dur,
+      v.signed_out_at ? 'Signed Out' : 'Inside'
+    ].map(cell => `"${String(cell).replace(/"/g,'""')}"`).join(',');
+  });
+
+  const csv  = [headers.join(','), ...rows].join('\r\n');
+  const blob = new Blob([csv], { type: 'text/csv' });
+  const url  = URL.createObjectURL(blob);
+  const a    = document.createElement('a');
+  a.href     = url;
+  a.download = `cityofgod-signin-${from}${from !== to ? '-to-' + to : ''}.csv`;
+  a.click();
+  URL.revokeObjectURL(url);
+}
+
+/* ── INIT ── */
+(function init() {
+  const saved = sessionStorage.getItem('cog_admin_token');
+  if (saved) { sessionToken = saved; showAdmin(); }
+  else document.getElementById('login-screen').style.display = 'flex';
+
+  // Set default dates
+  document.getElementById('filter-from').value = today();
+  document.getElementById('filter-to').value   = today();
+})();
+</script>
+</body>
+</html>
