@@ -221,6 +221,47 @@
       font-size: 0.85rem; display: none;
     }
 
+    /* ── NAME SEARCH ── */
+    .name-search-section {
+      background: var(--blue-l); border: 1.5px solid var(--blue-m);
+      border-radius: var(--radius); padding: 14px 16px;
+      display: flex; flex-direction: column; gap: 10px;
+    }
+    .name-search-label {
+      font-size: 0.85rem; font-weight: 700; color: var(--blue);
+      display: flex; align-items: center; gap: 7px;
+    }
+    .name-search-row { display: flex; gap: 8px; }
+    .name-search-row input { flex: 1; }
+    .btn-search-go {
+      background: var(--blue); color: #fff; border: none;
+      border-radius: 10px; padding: 0 18px; font-size: 1rem; cursor: pointer;
+      white-space: nowrap; font-weight: 600;
+    }
+    .search-results { display: flex; flex-direction: column; gap: 6px; }
+    .search-result-item {
+      background: #fff; border: 1.5px solid var(--border); border-radius: 10px;
+      padding: 11px 14px; cursor: pointer;
+      display: flex; justify-content: space-between; align-items: center;
+      transition: border-color 0.15s;
+    }
+    .search-result-item:hover, .search-result-item:active {
+      border-color: var(--blue); background: var(--blue-l);
+    }
+    .search-result-name { font-weight: 700; font-size: 0.95rem; }
+    .search-result-email { font-size: 0.8rem; color: var(--muted); margin-top: 2px; }
+    .search-hint {
+      font-size: 0.8rem; color: var(--muted); text-align: center; padding: 4px 0;
+    }
+    .search-hint.success { color: #16a34a; font-weight: 600; }
+    .search-or-divider {
+      display: flex; align-items: center; gap: 10px;
+      font-size: 0.8rem; color: var(--muted); font-weight: 500;
+    }
+    .search-or-divider::before, .search-or-divider::after {
+      content: ''; flex: 1; height: 1px; background: var(--border);
+    }
+
     /* ── DBS ── */
     .dbs-section { display: flex; flex-direction: column; gap: 5px; }
     .dbs-note {
@@ -487,8 +528,17 @@
       <div class="step-panel active" id="p-step-1">
         <div>
           <div class="step-heading"><i class="fas fa-user" style="color:var(--blue);margin-right:8px;"></i>Your Details</div>
-          <div class="step-sub">Please enter the parent or guardian's name</div>
+          <div class="step-sub">Search your name to sign in faster, or fill in your details below</div>
         </div>
+        <div class="name-search-section">
+          <div class="name-search-label"><i class="fas fa-search"></i> Search your name</div>
+          <div class="name-search-row">
+            <input type="text" id="p-name-search" placeholder="e.g. Sarah Johnson" autocomplete="off" oninput="debouncedNameSearch('p')" onkeydown="if(event.key==='Enter') runNameSearch('p','parent')">
+            <button class="btn-search-go" onclick="runNameSearch('p','parent')">Search</button>
+          </div>
+          <div id="p-search-results" class="search-results"></div>
+        </div>
+        <div class="search-or-divider">Or fill in your details below</div>
         <div class="field-row">
           <div class="field-group">
             <label>First Name <span class="req">*</span></label>
@@ -595,8 +645,17 @@
       <div class="step-panel active" id="s-step-1">
         <div>
           <div class="step-heading"><i class="fas fa-chalkboard-teacher" style="color:var(--blue);margin-right:8px;"></i>Your Details</div>
-          <div class="step-sub">Please enter your name and role</div>
+          <div class="step-sub">Search your name to sign in faster, or fill in your details below</div>
         </div>
+        <div class="name-search-section">
+          <div class="name-search-label"><i class="fas fa-search"></i> Search your name</div>
+          <div class="name-search-row">
+            <input type="text" id="s-name-search" placeholder="e.g. James Williams" autocomplete="off" oninput="debouncedNameSearch('s')" onkeydown="if(event.key==='Enter') runNameSearch('s','staff')">
+            <button class="btn-search-go" onclick="runNameSearch('s','staff')">Search</button>
+          </div>
+          <div id="s-search-results" class="search-results"></div>
+        </div>
+        <div class="search-or-divider">Or fill in your details below</div>
         <div class="field-row">
           <div class="field-group">
             <label>First Name <span class="req">*</span></label>
@@ -829,7 +888,8 @@ function goWelcome() {
 /* ── Reset ── */
 function resetAll() {
   // parent
-  ['p-first','p-last','p-email','p-phone'].forEach(id => { const el=document.getElementById(id); if(el) el.value=''; });
+  ['p-name-search','p-first','p-last','p-email','p-phone'].forEach(id => { const el=document.getElementById(id); if(el) el.value=''; });
+  const pRes = document.getElementById('p-search-results'); if(pRes) pRes.innerHTML = '';
   ['p-chk-safeguarding','p-chk-gdpr'].forEach(id => { const el=document.getElementById(id); if(el) el.checked=false; });
   childCount = 0;
   previousChildren = [];
@@ -842,7 +902,8 @@ function resetAll() {
   updateProgress('p', 3);
   document.querySelectorAll('#screen-parent .step-panel').forEach((p,i) => p.classList.toggle('active', i===0));
   // staff
-  ['s-first','s-last','s-email','s-phone','s-role','s-dbs','s-host'].forEach(id => { const el=document.getElementById(id); if(el) el.value=''; });
+  ['s-name-search','s-first','s-last','s-email','s-phone','s-role','s-dbs','s-host'].forEach(id => { const el=document.getElementById(id); if(el) el.value=''; });
+  const sRes = document.getElementById('s-search-results'); if(sRes) sRes.innerHTML = '';
   ['s-chk-safeguarding','s-chk-gdpr'].forEach(id => { const el=document.getElementById(id); if(el) el.checked=false; });
   sCurrentStep = 1;
   updateProgress('s', 3);
@@ -968,6 +1029,75 @@ function showPreviousChildren() {
 function hidePreviousChildren() {
   document.getElementById('returning-section').style.display = 'none';
   document.getElementById('btn-add-child-label').textContent = 'Add Child';
+}
+
+/* ── Step 1 name search ── */
+let _searchTimer = null;
+const _searchCache = {};
+
+function debouncedNameSearch(prefix) {
+  clearTimeout(_searchTimer);
+  const q = document.getElementById(`${prefix}-name-search`).value.trim();
+  if (q.length < 2) {
+    document.getElementById(`${prefix}-search-results`).innerHTML = '';
+    return;
+  }
+  _searchTimer = setTimeout(() => {
+    const type = prefix === 'p' ? 'parent' : 'staff';
+    runNameSearch(prefix, type);
+  }, 500);
+}
+
+async function runNameSearch(prefix, visitorType) {
+  const q = document.getElementById(`${prefix}-name-search`).value.trim();
+  if (!q) return;
+  const resultsEl = document.getElementById(`${prefix}-search-results`);
+  resultsEl.innerHTML = '<div class="search-hint"><i class="fas fa-spinner fa-spin"></i> Searching…</div>';
+  try {
+    const { data } = await db
+      .from('visitor_logs_cityofgod')
+      .select('first_name, last_name, email, phone, signed_in_at')
+      .eq('visitor_type', visitorType)
+      .or(`first_name.ilike.%${q}%,last_name.ilike.%${q}%`)
+      .order('signed_in_at', { ascending: false })
+      .limit(50);
+
+    if (!data || data.length === 0) {
+      resultsEl.innerHTML = '<div class="search-hint">No previous record found — please fill in your details below.</div>';
+      return;
+    }
+    // Deduplicate by email, keep most recent per person
+    const seen = new Set();
+    const unique = data.filter(r => {
+      const key = r.email ? r.email.toLowerCase() : `${r.first_name}|${r.last_name}`.toLowerCase();
+      if (seen.has(key)) return false;
+      seen.add(key); return true;
+    }).slice(0, 5);
+
+    _searchCache[prefix] = unique;
+    resultsEl.innerHTML = unique.map((r, i) => `
+      <div class="search-result-item" onclick="fillFromSearchResult('${prefix}', ${i})">
+        <div>
+          <div class="search-result-name">${r.first_name} ${r.last_name}</div>
+          ${r.email ? `<div class="search-result-email">${r.email}</div>` : ''}
+        </div>
+        <i class="fas fa-chevron-right" style="color:var(--muted)"></i>
+      </div>
+    `).join('');
+  } catch {
+    resultsEl.innerHTML = '<div class="search-hint">Search unavailable — please fill in your details below.</div>';
+  }
+}
+
+function fillFromSearchResult(prefix, index) {
+  const record = (_searchCache[prefix] || [])[index];
+  if (!record) return;
+  document.getElementById(`${prefix}-first`).value = record.first_name || '';
+  document.getElementById(`${prefix}-last`).value  = record.last_name  || '';
+  document.getElementById(`${prefix}-email`).value = record.email      || '';
+  document.getElementById(`${prefix}-phone`).value = record.phone      || '';
+  document.getElementById(`${prefix}-search-results`).innerHTML =
+    `<div class="search-hint success"><i class="fas fa-check-circle"></i> Details filled in — check them below and press Next.</div>`;
 }
 
 function addChild() {
