@@ -221,6 +221,35 @@
       font-size: 0.85rem; display: none;
     }
 
+    /* ── ALREADY-IN MODAL ── */
+    .modal-overlay {
+      position: fixed; inset: 0; background: rgba(0,0,0,0.55);
+      z-index: 9999; display: flex; align-items: center; justify-content: center;
+      padding: 24px;
+    }
+    .modal-box {
+      background: #fff; border-radius: 20px; padding: 32px 28px;
+      max-width: 400px; width: 100%; text-align: center;
+      box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+    }
+    .modal-icon {
+      width: 64px; height: 64px; border-radius: 50%;
+      background: #fef3c7; color: #d97706;
+      font-size: 1.8rem; display: flex; align-items: center; justify-content: center;
+      margin: 0 auto 16px;
+    }
+    .modal-title { font-size: 1.3rem; font-weight: 800; color: var(--text); margin-bottom: 10px; }
+    .modal-msg { font-size: 0.9rem; color: var(--muted); line-height: 1.5; margin-bottom: 24px; }
+    .modal-actions { display: flex; gap: 10px; }
+    .modal-btn-cancel {
+      flex: 1; padding: 13px; border: 1.5px solid var(--border); background: #fff;
+      border-radius: 12px; font-size: 0.95rem; font-weight: 600; cursor: pointer; color: var(--text);
+    }
+    .modal-btn-signout {
+      flex: 1; padding: 13px; border: none; background: var(--blue);
+      border-radius: 12px; font-size: 0.95rem; font-weight: 700; cursor: pointer; color: #fff;
+    }
+
     /* ── NAME SEARCH ── */
     .name-search-section {
       background: var(--blue-l); border: 1.5px solid var(--blue-m);
@@ -839,6 +868,19 @@
 
 </div>
 
+<!-- Already signed in modal -->
+<div class="modal-overlay" id="modal-already-in" style="display:none;">
+  <div class="modal-box">
+    <div class="modal-icon"><i class="fas fa-exclamation-triangle"></i></div>
+    <div class="modal-title">Already Signed In</div>
+    <div class="modal-msg" id="modal-already-msg">You are already signed in today. Please sign out before signing in again.</div>
+    <div class="modal-actions">
+      <button class="modal-btn-cancel" onclick="closeAlreadyInModal()">Cancel</button>
+      <button class="modal-btn-signout" onclick="closeAlreadyInModal(); startSignOut()">Sign Out Now</button>
+    </div>
+  </div>
+</div>
+
 <div class="toast" id="toast"></div>
 
 <script>
@@ -1169,6 +1211,13 @@ async function submitParent() {
   const spn = document.getElementById('p-spinner');
   btn.disabled = true; lbl.style.display = 'none'; spn.style.display = 'block';
 
+  const alreadyIn = await checkAlreadySignedIn(val('p-first'), val('p-last'), 'parent');
+  if (alreadyIn) {
+    btn.disabled = false; lbl.style.display = ''; spn.style.display = 'none';
+    showAlreadyInModal(val('p-first'));
+    return;
+  }
+
   const children = getChildren();
   const badgeId  = generateBadgeId();
   const now      = new Date();
@@ -1265,6 +1314,13 @@ async function submitStaff() {
   const lbl = document.getElementById('s-submit-label');
   const spn = document.getElementById('s-spinner');
   btn.disabled = true; lbl.style.display = 'none'; spn.style.display = 'block';
+
+  const alreadyIn = await checkAlreadySignedIn(val('s-first'), val('s-last'), 'staff');
+  if (alreadyIn) {
+    btn.disabled = false; lbl.style.display = ''; spn.style.display = 'none';
+    showAlreadyInModal(val('s-first'));
+    return;
+  }
 
   const badgeId = generateBadgeId();
   const now     = new Date();
@@ -1393,7 +1449,7 @@ async function confirmSignOut() {
     document.getElementById('signout-success-msg').textContent =
       `Goodbye, ${name.split(' ')[0]}! Thank you for visiting. Please return your visitor badge.`;
     showScreen('screen-signout-success');
-    let secs = 10;
+    let secs = 3;
     const el = document.getElementById('signout-countdown');
     function tick() {
       el.textContent = `Returning to welcome screen in ${secs}s…`;
@@ -1421,6 +1477,31 @@ function startBadgeCountdown() {
     badgeCountdownTimer = setTimeout(tick, 1000);
   }
   tick();
+}
+
+/* ── Duplicate sign-in guard ── */
+async function checkAlreadySignedIn(firstName, lastName, visitorType) {
+  const today = new Date().toISOString().slice(0, 10);
+  const { data } = await db
+    .from('visitor_logs_cityofgod')
+    .select('id')
+    .eq('visitor_type', visitorType)
+    .ilike('first_name', firstName)
+    .ilike('last_name', lastName)
+    .gte('signed_in_at', `${today}T00:00:00`)
+    .is('signed_out_at', null)
+    .limit(1);
+  return data && data.length > 0;
+}
+
+function showAlreadyInModal(firstName) {
+  document.getElementById('modal-already-msg').textContent =
+    `${firstName}, you are already signed in today. Please sign out before signing in again.`;
+  document.getElementById('modal-already-in').style.display = 'flex';
+}
+
+function closeAlreadyInModal() {
+  document.getElementById('modal-already-in').style.display = 'none';
 }
 
 function generateBadgeId() {
