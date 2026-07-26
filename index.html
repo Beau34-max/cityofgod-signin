@@ -183,6 +183,44 @@
     .btn-add-child:disabled { opacity: 0.4; cursor: not-allowed; }
     .child-count-note { font-size: 0.78rem; color: var(--muted); text-align: center; }
 
+    /* ── RETURNING VISITOR ── */
+    .returning-banner {
+      background: #ecfdf5; border: 1.5px solid #6ee7b7;
+      border-radius: 10px; padding: 12px 16px;
+      font-size: 0.88rem; color: #065f46; font-weight: 600;
+      display: flex; align-items: center; gap: 10px;
+    }
+    .returning-banner i { font-size: 1.1rem; flex-shrink: 0; }
+    .prev-children-grid { display: flex; flex-direction: column; gap: 8px; }
+    .prev-child-item {
+      display: flex; align-items: center; gap: 12px;
+      background: #fff; border: 1.5px solid var(--border);
+      border-radius: 10px; padding: 12px 14px; cursor: pointer;
+      transition: all 0.15s;
+    }
+    .prev-child-item:has(input:checked) { border-color: var(--blue); background: var(--blue-l); }
+    .prev-child-item input[type="checkbox"] {
+      width: 22px; height: 22px; flex-shrink: 0;
+      accent-color: var(--blue); cursor: pointer;
+    }
+    .prev-child-name { font-weight: 700; font-size: 0.95rem; color: var(--text); }
+    .prev-child-group {
+      display: inline-block; margin-left: 8px;
+      background: var(--blue-m); color: var(--blue-d);
+      font-size: 0.72rem; font-weight: 700; padding: 2px 8px; border-radius: 20px;
+    }
+    .section-divider {
+      display: flex; align-items: center; gap: 10px;
+      font-size: 0.78rem; color: var(--muted); font-weight: 600;
+    }
+    .section-divider::before, .section-divider::after {
+      content: ''; flex: 1; height: 1px; background: var(--border);
+    }
+    .searching-indicator {
+      text-align: center; padding: 14px; color: var(--muted);
+      font-size: 0.85rem; display: none;
+    }
+
     /* ── DBS ── */
     .dbs-section { display: flex; flex-direction: column; gap: 5px; }
     .dbs-note {
@@ -475,11 +513,27 @@
       <div class="step-panel" id="p-step-2">
         <div>
           <div class="step-heading"><i class="fas fa-child" style="color:var(--blue);margin-right:8px;"></i>Children</div>
-          <div class="step-sub">Add the children you are signing in (up to 5)</div>
+          <div class="step-sub" id="p-step2-sub">Select or add the children signing in today</div>
         </div>
+
+        <!-- Searching indicator -->
+        <div class="searching-indicator" id="searching-indicator">
+          <i class="fas fa-spinner fa-spin"></i> Looking up previous visits…
+        </div>
+
+        <!-- Returning visitor section -->
+        <div id="returning-section" style="display:none;">
+          <div class="returning-banner">
+            <i class="fas fa-star"></i>
+            <span id="returning-msg">Welcome back! Tick the children signing in today:</span>
+          </div>
+          <div class="prev-children-grid" id="prev-children-list"></div>
+          <div class="section-divider" id="new-child-divider" style="margin-top:4px;">Add another child</div>
+        </div>
+
         <div class="children-list" id="children-list"></div>
         <button class="btn-add-child" id="btn-add-child" onclick="addChild()">
-          <i class="fas fa-plus"></i> Add Child
+          <i class="fas fa-plus"></i> <span id="btn-add-child-label">Add Child</span>
         </button>
         <div class="child-count-note" id="child-count-note"></div>
         <div class="form-nav">
@@ -762,7 +816,11 @@ function resetAll() {
   ['p-first','p-last'].forEach(id => { const el=document.getElementById(id); if(el) el.value=''; });
   ['p-chk-safeguarding','p-chk-gdpr'].forEach(id => { const el=document.getElementById(id); if(el) el.checked=false; });
   childCount = 0;
+  previousChildren = [];
   document.getElementById('children-list').innerHTML = '';
+  document.getElementById('returning-section').style.display = 'none';
+  document.getElementById('searching-indicator').style.display = 'none';
+  document.getElementById('btn-add-child-label').textContent = 'Add Child';
   updateAddChildBtn();
   pCurrentStep = 1;
   updateProgress('p', 3);
@@ -792,13 +850,17 @@ function updateProgress(prefix, total) {
 /* ══════════════════ PARENT FLOW ══════════════════ */
 let pCurrentStep = 1;
 let childCount = 0;
+let previousChildren = [];
 const MAX_CHILDREN = 5;
 
-function startParent() { resetAll(); showScreen('screen-parent'); addChild(); }
+function startParent() { resetAll(); showScreen('screen-parent'); }
 
-function pGoStep(n) {
+async function pGoStep(n) {
   const err = pValidateStep(pCurrentStep);
   if (err) { showToast(err, 'error'); return; }
+
+  if (n === 2) await lookupPreviousVisit();
+
   pCurrentStep = n;
   document.querySelectorAll('#screen-parent .step-panel').forEach((p,i) => p.classList.toggle('active', i+1===n));
   updateProgress('p', 3);
@@ -810,14 +872,79 @@ function pValidateStep(n) {
     if (!val('p-last'))  return 'Please enter your last name.';
   }
   if (n === 2) {
-    const rows = document.querySelectorAll('#children-list .child-row');
-    if (rows.length === 0) return 'Please add at least one child.';
-    for (const row of rows) {
-      const name = row.querySelector('.child-name');
-      if (!name.value.trim()) return 'Please enter a name for each child.';
+    const prevChecked = document.querySelectorAll('.prev-child-checkbox:checked').length;
+    const newRows     = document.querySelectorAll('#children-list .child-row');
+    const newNamed    = Array.from(newRows).filter(r => r.querySelector('.child-name').value.trim()).length;
+    if (prevChecked + newNamed === 0) return 'Please select or add at least one child.';
+    for (const row of newRows) {
+      if (!row.querySelector('.child-name').value.trim()) return 'Please enter a name for each child added.';
     }
   }
   return null;
+}
+
+/* ── Returning visitor lookup ── */
+async function lookupPreviousVisit() {
+  const firstName = val('p-first');
+  const lastName  = val('p-last');
+
+  document.getElementById('searching-indicator').style.display = 'flex';
+  document.getElementById('returning-section').style.display   = 'none';
+  document.getElementById('children-list').innerHTML = '';
+  childCount = 0;
+
+  try {
+    const { data } = await db
+      .from('visitor_logs_cityofgod')
+      .select('children, signed_in_at')
+      .ilike('first_name', firstName)
+      .ilike('last_name', lastName)
+      .eq('visitor_type', 'parent')
+      .not('children', 'is', null)
+      .order('signed_in_at', { ascending: false })
+      .limit(1);
+
+    document.getElementById('searching-indicator').style.display = 'none';
+
+    if (data && data.length > 0 && data[0].children && data[0].children.length > 0) {
+      previousChildren = data[0].children;
+      showPreviousChildren();
+    } else {
+      previousChildren = [];
+      hidePreviousChildren();
+      addChild();
+    }
+  } catch {
+    document.getElementById('searching-indicator').style.display = 'none';
+    previousChildren = [];
+    hidePreviousChildren();
+    addChild();
+  }
+}
+
+function showPreviousChildren() {
+  const section = document.getElementById('returning-section');
+  const list    = document.getElementById('prev-children-list');
+  document.getElementById('returning-msg').textContent =
+    `Welcome back, ${val('p-first')}! Tick the children signing in today:`;
+  list.innerHTML = previousChildren.map((c, i) => `
+    <label class="prev-child-item">
+      <input type="checkbox" class="prev-child-checkbox" value="${i}" checked>
+      <div>
+        <span class="prev-child-name">${c.name || c}</span>
+        ${c.year_group && c.year_group !== 'Not specified'
+          ? `<span class="prev-child-group">${c.year_group}</span>` : ''}
+      </div>
+    </label>
+  `).join('');
+  section.style.display = 'block';
+  document.getElementById('new-child-divider').style.display = 'flex';
+  document.getElementById('btn-add-child-label').textContent = 'Add a child not listed above';
+}
+
+function hidePreviousChildren() {
+  document.getElementById('returning-section').style.display = 'none';
+  document.getElementById('btn-add-child-label').textContent = 'Add Child';
 }
 
 function addChild() {
@@ -867,10 +994,15 @@ function updateAddChildBtn() {
 }
 
 function getChildren() {
-  return Array.from(document.querySelectorAll('#children-list .child-row')).map(row => ({
-    name:       row.querySelector('.child-name').value.trim(),
-    year_group: row.querySelector('.child-year').value || 'Not specified'
-  }));
+  const fromPrev = Array.from(document.querySelectorAll('.prev-child-checkbox:checked'))
+    .map(cb => previousChildren[parseInt(cb.value)]);
+  const fromNew = Array.from(document.querySelectorAll('#children-list .child-row'))
+    .filter(row => row.querySelector('.child-name').value.trim())
+    .map(row => ({
+      name:       row.querySelector('.child-name').value.trim(),
+      year_group: row.querySelector('.child-year').value || 'Not specified'
+    }));
+  return [...fromPrev, ...fromNew];
 }
 
 async function submitParent() {
