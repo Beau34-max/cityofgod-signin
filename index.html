@@ -826,13 +826,19 @@
       <div class="signout-header">
         <div>
           <div class="signout-title"><i class="fas fa-sign-out-alt" style="color:var(--blue);margin-right:8px;"></i>Sign Out</div>
-          <div class="signout-sub">Tap your name to sign out</div>
+          <div class="signout-sub">Search your name to sign out</div>
         </div>
         <button class="btn-back-welcome" onclick="goWelcome()"><i class="fas fa-arrow-left"></i> Back</button>
       </div>
-      <div id="visitor-list">
-        <div class="empty-state"><i class="fas fa-spinner fa-spin"></i> Loading…</div>
+      <div class="name-search-section">
+        <div class="name-search-label"><i class="fas fa-search"></i> Search your name</div>
+        <div class="name-search-row">
+          <input type="text" id="signout-search" placeholder="e.g. Uchenna Egwu" autocomplete="off"
+            oninput="debouncedSignOutSearch()" onkeydown="if(event.key==='Enter') runSignOutSearch()">
+          <button class="btn-search-go" onclick="runSignOutSearch()">Search</button>
+        </div>
       </div>
+      <div id="visitor-list"></div>
     </div>
   </div>
 
@@ -1364,14 +1370,27 @@ async function submitStaff() {
 /* ══════════════════ SIGN OUT ══════════════════ */
 let pendingSignOutId = null;
 
-async function startSignOut() {
+let _signoutSearchTimer = null;
+
+function startSignOut() {
   showScreen('screen-signout');
-  await loadTodayVisitors();
+  document.getElementById('signout-search').value = '';
+  document.getElementById('visitor-list').innerHTML = '';
+  setTimeout(() => document.getElementById('signout-search').focus(), 100);
 }
 
-async function loadTodayVisitors() {
+function debouncedSignOutSearch() {
+  clearTimeout(_signoutSearchTimer);
+  const q = document.getElementById('signout-search').value.trim();
+  if (!q) { document.getElementById('visitor-list').innerHTML = ''; return; }
+  _signoutSearchTimer = setTimeout(runSignOutSearch, 400);
+}
+
+async function runSignOutSearch() {
+  const q = document.getElementById('signout-search').value.trim();
+  if (!q) return;
   const listEl = document.getElementById('visitor-list');
-  listEl.innerHTML = '<div class="empty-state"><i class="fas fa-spinner fa-spin"></i> Loading…</div>';
+  listEl.innerHTML = '<div class="empty-state"><i class="fas fa-spinner fa-spin"></i> Searching…</div>';
   const today = new Date().toISOString().slice(0, 10);
   try {
     const { data, error } = await db
@@ -1380,11 +1399,12 @@ async function loadTodayVisitors() {
       .gte('signed_in_at', `${today}T00:00:00`)
       .lte('signed_in_at', `${today}T23:59:59`)
       .is('signed_out_at', null)
+      .or(`first_name.ilike.%${q}%,last_name.ilike.%${q}%`)
       .order('signed_in_at', { ascending: true });
     if (error) throw error;
 
     if (!data || data.length === 0) {
-      listEl.innerHTML = '<div class="empty-state"><i class="fas fa-users"></i><div>No one currently signed in</div></div>';
+      listEl.innerHTML = '<div class="empty-state"><i class="fas fa-search"></i><div>No match found — check your spelling or ask for help.</div></div>';
       return;
     }
     listEl.innerHTML = data.map(v => {
@@ -1395,7 +1415,7 @@ async function loadTodayVisitors() {
         ? ' · ' + v.children.map(c => c.name).join(', ')
         : '';
       const meta = isParent
-        ? `Visiting ${v.host_name} · ${v.purpose}${childNames}`
+        ? `${v.purpose}${childNames}`
         : `${v.staff_role || v.purpose} · Reporting to ${v.host_name}`;
       return `
         <div class="visitor-card" onclick="promptSignOut('${v.id}','${escHtml(v.first_name + ' ' + v.last_name)}','${escHtml(v.host_name)}','${escHtml(v.purpose)}','${v.signed_in_at}')">
@@ -1410,7 +1430,7 @@ async function loadTodayVisitors() {
     }).join('');
   } catch (e) {
     console.error(e);
-    listEl.innerHTML = '<div class="empty-state"><i class="fas fa-exclamation-triangle" style="color:var(--red)"></i><div>Could not load. Please try again.</div></div>';
+    listEl.innerHTML = '<div class="empty-state"><i class="fas fa-exclamation-triangle" style="color:var(--red)"></i><div>Could not search. Please try again.</div></div>';
   }
 }
 
