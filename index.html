@@ -1446,7 +1446,7 @@ async function confirmSignOut() {
     document.getElementById('signout-success-msg').textContent =
       `Goodbye, ${name.split(' ')[0]}! Thank you for visiting. Please return your visitor badge.`;
     showScreen('screen-signout-success');
-    let secs = 3;
+    let secs = 1;
     const el = document.getElementById('signout-countdown');
     function tick() {
       el.textContent = `Returning to welcome screen in ${secs}s…`;
