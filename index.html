@@ -500,6 +500,14 @@
           </div>
         </div>
         <div class="field-group">
+          <label>Email Address <span class="req">*</span></label>
+          <input type="email" id="p-email" placeholder="e.g. sarah@example.com" autocomplete="off" inputmode="email">
+        </div>
+        <div class="field-group">
+          <label>Phone Number <span class="req">*</span></label>
+          <input type="tel" id="p-phone" placeholder="e.g. 07700 900000" autocomplete="off" inputmode="tel">
+        </div>
+        <div class="field-group">
           <label>Organisation</label>
           <div class="field-static"><i class="fas fa-building" style="margin-right:8px;opacity:0.5;"></i>City of God Children Department</div>
         </div>
@@ -598,6 +606,14 @@
             <label>Last Name <span class="req">*</span></label>
             <input type="text" id="s-last" placeholder="e.g. Williams" autocomplete="off">
           </div>
+        </div>
+        <div class="field-group">
+          <label>Email Address <span class="req">*</span></label>
+          <input type="email" id="s-email" placeholder="e.g. james@example.com" autocomplete="off" inputmode="email">
+        </div>
+        <div class="field-group">
+          <label>Phone Number <span class="req">*</span></label>
+          <input type="tel" id="s-phone" placeholder="e.g. 07700 900000" autocomplete="off" inputmode="tel">
         </div>
         <div class="field-group">
           <label>Role <span class="req">*</span></label>
@@ -813,7 +829,7 @@ function goWelcome() {
 /* ── Reset ── */
 function resetAll() {
   // parent
-  ['p-first','p-last'].forEach(id => { const el=document.getElementById(id); if(el) el.value=''; });
+  ['p-first','p-last','p-email','p-phone'].forEach(id => { const el=document.getElementById(id); if(el) el.value=''; });
   ['p-chk-safeguarding','p-chk-gdpr'].forEach(id => { const el=document.getElementById(id); if(el) el.checked=false; });
   childCount = 0;
   previousChildren = [];
@@ -826,7 +842,7 @@ function resetAll() {
   updateProgress('p', 3);
   document.querySelectorAll('#screen-parent .step-panel').forEach((p,i) => p.classList.toggle('active', i===0));
   // staff
-  ['s-first','s-last','s-role','s-dbs','s-host'].forEach(id => { const el=document.getElementById(id); if(el) el.value=''; });
+  ['s-first','s-last','s-email','s-phone','s-role','s-dbs','s-host'].forEach(id => { const el=document.getElementById(id); if(el) el.value=''; });
   ['s-chk-safeguarding','s-chk-gdpr'].forEach(id => { const el=document.getElementById(id); if(el) el.checked=false; });
   sCurrentStep = 1;
   updateProgress('s', 3);
@@ -866,10 +882,17 @@ async function pGoStep(n) {
   updateProgress('p', 3);
 }
 
+function isValidEmail(e) { return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(e.trim()); }
+function isValidPhone(p) { return p.replace(/[\s\-().+]/g, '').length >= 7; }
+
 function pValidateStep(n) {
   if (n === 1) {
     if (!val('p-first')) return 'Please enter your first name.';
     if (!val('p-last'))  return 'Please enter your last name.';
+    if (!val('p-email')) return 'Please enter your email address.';
+    if (!isValidEmail(val('p-email'))) return 'Please enter a valid email address.';
+    if (!val('p-phone')) return 'Please enter your phone number.';
+    if (!isValidPhone(val('p-phone'))) return 'Please enter a valid phone number.';
   }
   if (n === 2) {
     const prevChecked = document.querySelectorAll('.prev-child-checkbox:checked').length;
@@ -1023,6 +1046,8 @@ async function submitParent() {
   const record = {
     first_name:   val('p-first'),
     last_name:    val('p-last'),
+    email:        val('p-email'),
+    phone:        val('p-phone'),
     organisation: ORG,
     host_name:    'N/A',
     purpose:      'Drop-off / Collection',
@@ -1087,6 +1112,10 @@ function sValidateStep(n) {
   if (n === 1) {
     if (!val('s-first')) return 'Please enter your first name.';
     if (!val('s-last'))  return 'Please enter your last name.';
+    if (!val('s-email')) return 'Please enter your email address.';
+    if (!isValidEmail(val('s-email'))) return 'Please enter a valid email address.';
+    if (!val('s-phone')) return 'Please enter your phone number.';
+    if (!isValidPhone(val('s-phone'))) return 'Please enter a valid phone number.';
     if (!val('s-role'))  return 'Please select your role.';
   }
   if (n === 2) {
@@ -1113,6 +1142,8 @@ async function submitStaff() {
   const record = {
     first_name:   val('s-first'),
     last_name:    val('s-last'),
+    email:        val('s-email'),
+    phone:        val('s-phone'),
     organisation: ORG,
     host_name:    val('s-host'),
     purpose:      val('s-role'),
