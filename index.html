@@ -1407,7 +1407,8 @@ async function runSignOutSearch() {
       listEl.innerHTML = '<div class="empty-state"><i class="fas fa-search"></i><div>No match found — check your spelling or ask for help.</div></div>';
       return;
     }
-    listEl.innerHTML = data.map(v => {
+    window._soResults = data;
+    listEl.innerHTML = data.map((v, i) => {
       const isParent   = v.visitor_type === 'parent';
       const badgeCls   = isParent ? 'badge-parent' : 'badge-staff';
       const badgeLbl   = isParent ? 'Parent' : 'Staff';
@@ -1418,7 +1419,7 @@ async function runSignOutSearch() {
         ? `${v.purpose}${childNames}`
         : `${v.staff_role || v.purpose} · Reporting to ${v.host_name}`;
       return `
-        <div class="visitor-card" onclick="promptSignOut('${v.id}','${escHtml(v.first_name + ' ' + v.last_name)}','${escHtml(v.host_name)}','${escHtml(v.purpose)}','${v.signed_in_at}')">
+        <div class="visitor-card" onclick="pickSignOut(${i})">
           <div class="visitor-card-info">
             <div class="visitor-card-name">
               <span class="visitor-card-badge ${badgeCls}">${badgeLbl}</span>${v.first_name} ${v.last_name}
@@ -1440,11 +1441,17 @@ function formatTime(iso) {
   return new Date(iso).toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit' });
 }
 
+function pickSignOut(index) {
+  const v = (window._soResults || [])[index];
+  if (!v) return;
+  promptSignOut(v.id, `${v.first_name} ${v.last_name}`, v.host_name, v.staff_role || v.purpose, v.signed_in_at);
+}
+
 function promptSignOut(id, name, host, purpose, signedIn) {
   pendingSignOutId = id;
   document.getElementById('confirm-name').textContent = name;
   document.getElementById('confirm-meta').textContent =
-    `Here to see ${host} · ${purpose} · Signed in at ${formatTime(signedIn)}`;
+    `${host && host !== 'N/A' ? 'Reporting to ' + host + ' · ' : ''}${purpose} · Signed in at ${formatTime(signedIn)}`;
   showScreen('screen-confirm');
 }
 
