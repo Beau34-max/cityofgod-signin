@@ -1097,22 +1097,35 @@ async function runNameSearch(prefix, visitorType) {
   const resultsEl = document.getElementById(`${prefix}-search-results`);
   resultsEl.innerHTML = '<div class="search-hint"><i class="fas fa-spinner fa-spin"></i> Searching…</div>';
   try {
-    const { data } = await db
+    // Search all types so returning visitors are always found regardless of how they signed in before
+    let { data, error } = await db
       .from('visitor_logs_cityofgod')
       .select('first_name, last_name, email, phone, signed_in_at')
-      .eq('visitor_type', visitorType)
       .or(`first_name.ilike.%${q}%,last_name.ilike.%${q}%`)
       .order('signed_in_at', { ascending: false })
       .limit(50);
 
-    if (!data || data.length === 0) {
+    // If email/phone columns don't exist yet, retry without them
+    if (error) {
+      const fallback = await db
+        .from('visitor_logs_cityofgod')
+        .select('first_name, last_name, signed_in_at')
+        .or(`first_name.ilike.%${q}%,last_name.ilike.%${q}%`)
+        .order('signed_in_at', { ascending: false })
+        .limit(50);
+      data  = fallback.data;
+      error = fallback.error;
+    }
+
+    if (error || !data || data.length === 0) {
       resultsEl.innerHTML = '<div class="search-hint">No previous record found — please fill in your details below.</div>';
       return;
     }
-    // Deduplicate by email, keep most recent per person
+
+    // Deduplicate by name, keep most recent per person
     const seen = new Set();
     const unique = data.filter(r => {
-      const key = r.email ? r.email.toLowerCase() : `${r.first_name}|${r.last_name}`.toLowerCase();
+      const key = `${r.first_name}|${r.last_name}`.toLowerCase();
       if (seen.has(key)) return false;
       seen.add(key); return true;
     }).slice(0, 5);
