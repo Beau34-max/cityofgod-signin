@@ -253,19 +253,31 @@
     /* ── NAME SEARCH ── */
     .name-search-section {
       background: var(--blue-l); border: 1.5px solid var(--blue-m);
-      border-radius: var(--radius); padding: 14px 16px;
-      display: flex; flex-direction: column; gap: 10px;
+      border-radius: var(--radius); padding: 16px 18px;
+      display: flex; flex-direction: column; gap: 12px;
     }
     .name-search-label {
-      font-size: 0.85rem; font-weight: 700; color: var(--blue);
-      display: flex; align-items: center; gap: 7px;
+      font-size: 1.05rem; font-weight: 700; color: var(--blue);
+      display: flex; align-items: center; gap: 8px;
     }
-    .name-search-row { display: flex; gap: 8px; }
-    .name-search-row input { flex: 1; }
+    .name-search-row { display: flex; gap: 10px; }
+    .name-search-row input {
+      flex: 1;
+      padding: 15px 16px;
+      border: 2px solid var(--border);
+      border-radius: 10px;
+      font-size: 1.15rem;
+      font-family: inherit;
+      background: #fff;
+      color: var(--text);
+      outline: none;
+      transition: border-color 0.15s;
+    }
+    .name-search-row input:focus { border-color: var(--blue); box-shadow: 0 0 0 3px rgba(0,80,180,0.12); }
     .btn-search-go {
       background: var(--blue); color: #fff; border: none;
-      border-radius: 10px; padding: 0 18px; font-size: 1rem; cursor: pointer;
-      white-space: nowrap; font-weight: 600;
+      border-radius: 10px; padding: 0 22px; font-size: 1.1rem; cursor: pointer;
+      white-space: nowrap; font-weight: 700;
     }
     .search-results { display: flex; flex-direction: column; gap: 6px; }
     .search-result-item {
