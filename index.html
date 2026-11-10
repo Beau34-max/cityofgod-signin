@@ -658,6 +658,9 @@
         <i class="fas fa-shield-halved"></i>
         <span>City of God Children Department is committed to safeguarding children. All parents and staff must sign in. Data is held securely for 12 months under UK GDPR.</span>
       </div>
+      <button onclick="toggleFullscreen()" title="Toggle fullscreen" style="position:absolute;bottom:14px;right:16px;background:rgba(0,0,0,0.08);border:none;border-radius:8px;padding:7px 10px;cursor:pointer;color:#555;font-size:0.8rem;display:flex;align-items:center;gap:6px;">
+        <i class="fas fa-expand"></i> Fullscreen
+      </button>
     </div>
   </div>
 
@@ -1039,6 +1042,24 @@ function goWelcome() {
   showScreen('screen-welcome');
 }
 
+/* ── Fullscreen ──────────────────────────────────────── */
+function requestKioskFullscreen() {
+  const el = document.documentElement;
+  const req = el.requestFullscreen || el.webkitRequestFullscreen || el.mozRequestFullScreen || el.msRequestFullscreen;
+  if (req) req.call(el).catch(() => {});
+}
+function exitKioskFullscreen() {
+  const ex = document.exitFullscreen || document.webkitExitFullscreen || document.mozCancelFullScreen || document.msExitFullscreen;
+  if (ex) ex.call(document).catch(() => {});
+}
+function toggleFullscreen() {
+  if (document.fullscreenElement || document.webkitFullscreenElement) {
+    exitKioskFullscreen();
+  } else {
+    requestKioskFullscreen();
+  }
+}
+
 /* ── Reset ── */
 function resetAll() {
   // parent
@@ -1084,7 +1105,7 @@ let childCount = 0;
 let previousChildren = [];
 const MAX_CHILDREN = 5;
 
-function startParent() { resetAll(); showScreen('screen-parent'); updatePCardHeader(1); }
+function startParent() { requestKioskFullscreen(); resetAll(); showScreen('screen-parent'); updatePCardHeader(1); }
 
 const P_CARD_HEADERS = [
   ['Parent / Guardian Sign In', 'Your details first, then add your children'],
@@ -1428,7 +1449,7 @@ async function submitParent() {
 /* ══════════════════ STAFF FLOW ══════════════════ */
 let sCurrentStep = 1;
 
-function startStaff() { resetAll(); showScreen('screen-staff'); updateSCardHeader(1); }
+function startStaff() { requestKioskFullscreen(); resetAll(); showScreen('screen-staff'); updateSCardHeader(1); }
 
 function updateSCardHeader(n) {
   const [t, s] = S_CARD_HEADERS[n - 1];
@@ -1538,6 +1559,7 @@ let pendingSignOutId = null;
 let _signoutSearchTimer = null;
 
 function startSignOut() {
+  requestKioskFullscreen();
   showScreen('screen-signout');
   document.getElementById('signout-search').value = '';
   document.getElementById('visitor-list').innerHTML = '';
