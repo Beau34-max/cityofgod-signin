@@ -502,6 +502,65 @@
       .child-fields  { grid-template-columns: 1fr; }
       .badge-name    { font-size: 1.5rem; }
     }
+
+    /* ── TABLET FIT: compact spacing so each step fits without scrolling ── */
+    @media (min-width: 600px) {
+      /* Smaller header */
+      .kiosk-header          { padding: 8px 20px; }
+      .kiosk-brand-icon      { height: 36px; }
+      .kiosk-clock .time     { font-size: 1.3rem; }
+      .kiosk-main            { padding-top: 58px; }
+
+      /* Welcome screen */
+      .welcome-body          { gap: 14px; padding: 16px 20px; }
+      .welcome-icon          { width: 150px; }
+      .welcome-title         { font-size: 1.6rem; }
+      .welcome-sub           { font-size: 0.9rem; }
+      .mode-btn              { padding: 14px 18px; font-size: 1rem; }
+      .mode-btn i            { font-size: 1.3rem; }
+      .safeguard-note        { font-size: 0.72rem; padding: 8px 12px; }
+
+      /* Form layout */
+      .form-body             { padding: 10px 16px 12px; }
+      .progress-row          { margin-bottom: 10px; }
+      .step-dot              { width: 28px; height: 28px; font-size: 0.75rem; }
+      .step-panel            { gap: 10px; }
+      .step-heading          { font-size: 1.1rem; }
+      .step-sub              { font-size: 0.8rem; }
+
+      /* Name search */
+      .name-search-section   { padding: 10px 14px; gap: 8px; }
+      .name-search-label     { font-size: 0.95rem; }
+      .name-search-row input { padding: 10px 12px; font-size: 1rem; }
+
+      /* Inputs */
+      .field-group input,
+      .field-group select    { padding: 9px 12px; font-size: 0.95rem; }
+      .field-group label     { font-size: 0.8rem; }
+      .field-group           { gap: 4px; }
+
+      /* Children rows */
+      .child-fields input,
+      .child-fields select   { padding: 8px 10px; font-size: 0.88rem; }
+      .child-row             { padding: 10px 12px; }
+      .btn-add-child         { padding: 10px; font-size: 0.88rem; }
+
+      /* Checkboxes / GDPR */
+      .check-group           { padding: 10px 14px; gap: 10px; }
+      .check-item-text       { font-size: 0.8rem; }
+      .gdpr-box              { padding: 10px 12px; font-size: 0.72rem; }
+
+      /* Nav buttons */
+      .btn-next, .btn-submit { padding: 11px 20px; font-size: 0.95rem; }
+      .btn-back              { padding: 11px 18px; font-size: 0.95rem; }
+      .btn-cancel            { padding: 10px 16px; font-size: 0.85rem; }
+      .form-nav              { margin-top: 2px; }
+
+      /* Sign-out screen */
+      .signout-body          { gap: 10px; padding: 10px 16px; }
+      .signout-title         { font-size: 1.1rem; }
+      .visitor-card          { padding: 11px 14px; }
+    }
   </style>
 </head>
 <body>
