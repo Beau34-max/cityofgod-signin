@@ -1284,24 +1284,25 @@ function addChild() {
         <option>Gold (9–12yrs)</option>
       </select>
     </div>
-    <button type="button" class="btn-remove-child" onclick="removeChild(this)" title="Remove"><i class="fas fa-times"></i></button>
+    <button type="button" class="btn-remove-child" data-remove-child title="Remove"><i class="fas fa-times"></i></button>
   `;
   list.appendChild(row);
   updateAddChildBtn();
   row.querySelector('.child-name').focus();
 }
 
-function removeChild(btn) {
-  const row = btn.closest('.child-row');
+/* Single delegated listener — handles all remove buttons, present and future */
+document.addEventListener('click', function(e) {
+  if (!e.target.closest('[data-remove-child]')) return;
+  const row = e.target.closest('.child-row');
   if (!row) return;
   row.remove();
   childCount--;
-  // Re-number
-  document.querySelectorAll('#children-list .child-row').forEach((row, i) => {
-    row.querySelector('.child-num').textContent = i + 1;
+  document.querySelectorAll('#children-list .child-row').forEach((r, i) => {
+    r.querySelector('.child-num').textContent = i + 1;
   });
   updateAddChildBtn();
-}
+});
 
 function updateAddChildBtn() {
   const btn  = document.getElementById('btn-add-child');
