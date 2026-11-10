@@ -172,6 +172,7 @@
       display: flex; align-items: center; justify-content: center;
     }
     .btn-remove-child:hover { background: var(--red); color: #fff; }
+    .btn-remove-child i { pointer-events: none; }
     .btn-add-child {
       padding: 12px; border-radius: 10px;
       border: 2px dashed var(--blue-m); background: var(--blue-l);
@@ -1283,7 +1284,7 @@ function addChild() {
         <option>Gold (9–12yrs)</option>
       </select>
     </div>
-    <button class="btn-remove-child" onclick="removeChild(this)" title="Remove"><i class="fas fa-times"></i></button>
+    <button type="button" class="btn-remove-child" onclick="removeChild(this)" title="Remove"><i class="fas fa-times"></i></button>
   `;
   list.appendChild(row);
   updateAddChildBtn();
@@ -1291,7 +1292,9 @@ function addChild() {
 }
 
 function removeChild(btn) {
-  btn.closest('.child-row').remove();
+  const row = btn.closest('.child-row');
+  if (!row) return;
+  row.remove();
   childCount--;
   // Re-number
   document.querySelectorAll('#children-list .child-row').forEach((row, i) => {
