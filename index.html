@@ -332,6 +332,12 @@
     }
     .gdpr-box strong { color: var(--text); }
 
+    .implicit-consent {
+      font-size: 0.72rem; color: var(--muted); line-height: 1.55;
+      border-top: 1px solid var(--border); padding-top: 10px;
+    }
+    .implicit-consent a { color: var(--blue); }
+
     /* ── NAV BUTTONS ── */
     .form-nav { display: flex; gap: 12px; margin-top: 8px; }
     .btn-back {
@@ -680,8 +686,6 @@
             <div class="step-dot current" id="p-dot-1">1</div>
             <div class="step-line" id="p-line-1"></div>
             <div class="step-dot" id="p-dot-2">2</div>
-            <div class="step-line" id="p-line-2"></div>
-            <div class="step-dot" id="p-dot-3">3</div>
           </div>
 
           <!-- P-STEP 1: Guardian -->
@@ -745,26 +749,7 @@
           <i class="fas fa-plus"></i> <span id="btn-add-child-label">Add Child</span>
         </button>
         <div class="child-count-note" id="child-count-note"></div>
-            <div class="form-nav">
-              <button class="btn-next" onclick="pGoStep(3)">Continue <i class="fas fa-arrow-right"></i></button>
-            </div>
-          </div>
-
-          <!-- P-STEP 3: Confirm -->
-          <div class="step-panel" id="p-step-3">
-            <div class="check-group">
-          <label class="check-item">
-            <input type="checkbox" id="p-chk-safeguarding">
-            <span class="check-item-text"><strong>Safeguarding:</strong> I confirm I have read the safeguarding information at reception and agree to abide by the City of God Children Safeguarding Policy.</span>
-          </label>
-          <label class="check-item">
-            <input type="checkbox" id="p-chk-gdpr">
-            <span class="check-item-text"><strong>Data Consent:</strong> I consent to my and my children's details being stored securely for safeguarding purposes in accordance with UK GDPR.</span>
-          </label>
-        </div>
-        <div class="gdpr-box">
-          <strong>Privacy Notice:</strong> Your name and your children's details will be stored securely by City of God Children Department for <strong>12 months</strong> then deleted. Used solely for safeguarding, security and emergency evacuation. Contact us to request access or deletion.
-        </div>
+            <p class="implicit-consent">By clicking Sign In you confirm you have read and agree to the <strong>City of God Safeguarding Policy</strong>, and consent to your and your children's details being stored securely for 12 months under UK GDPR. Contact us at reception to request access or deletion.</p>
             <div class="form-nav">
               <button class="btn-submit" id="p-btn-submit" onclick="submitParent()">
                 <span id="p-submit-label"><i class="fas fa-check"></i> Sign In</span>
@@ -793,8 +778,6 @@
             <div class="step-dot current" id="s-dot-1">1</div>
             <div class="step-line" id="s-line-1"></div>
             <div class="step-dot" id="s-dot-2">2</div>
-            <div class="step-line" id="s-line-2"></div>
-            <div class="step-dot" id="s-dot-3">3</div>
           </div>
 
           <!-- S-STEP 1: Staff details -->
@@ -822,34 +805,32 @@
           <label>Email Address <span class="req">*</span></label>
           <input type="email" id="s-email" placeholder="e.g. james@example.com" autocomplete="off" inputmode="email">
         </div>
-        <div class="field-group">
-          <label>Phone Number <span class="req">*</span></label>
-          <input type="tel" id="s-phone" placeholder="e.g. 07700 900000" autocomplete="off" inputmode="tel">
-        </div>
-        <div class="field-group">
-          <label>Role <span class="req">*</span></label>
-          <select id="s-role">
-            <option value="">— Select your role —</option>
-            <option>Teacher</option>
-            <option>Teaching Assistant</option>
-            <option>Children's Leader</option>
-            <option>Support Staff</option>
-            <option>Volunteer</option>
-            <option>Coordinator</option>
-            <option>Other</option>
-          </select>
-        </div>
-        <div class="field-group">
-          <label>Organisation</label>
-          <div class="field-static"><i class="fas fa-building" style="margin-right:8px;opacity:0.5;"></i>City of God Children Department</div>
-        </div>
             <div class="form-nav">
               <button class="btn-next" onclick="sGoStep(2)">Continue <i class="fas fa-arrow-right"></i></button>
             </div>
           </div>
 
-          <!-- S-STEP 2: DBS + host -->
+          <!-- S-STEP 2: Role + DBS -->
           <div class="step-panel" id="s-step-2">
+            <div class="field-row">
+              <div class="field-group">
+                <label>Phone Number <span class="req">*</span></label>
+                <input type="tel" id="s-phone" placeholder="e.g. 07700 900000" autocomplete="off" inputmode="tel">
+              </div>
+              <div class="field-group">
+                <label>Role <span class="req">*</span></label>
+                <select id="s-role">
+                  <option value="">— Select —</option>
+                  <option>Teacher</option>
+                  <option>Teaching Assistant</option>
+                  <option>Children's Leader</option>
+                  <option>Support Staff</option>
+                  <option>Volunteer</option>
+                  <option>Coordinator</option>
+                  <option>Other</option>
+                </select>
+              </div>
+            </div>
             <div class="dbs-section">
           <div class="field-group">
             <label>DBS Certificate Status <span class="req">*</span></label>
@@ -864,34 +845,7 @@
           </div>
           <div class="dbs-note"><i class="fas fa-circle-info" style="margin-top:1px;flex-shrink:0;"></i> All staff and volunteers working with children must hold a valid Enhanced DBS. Please ensure yours is up to date.</div>
         </div>
-        <div class="field-group">
-          <label>Reporting to / Line Manager <span class="req">*</span></label>
-          <input type="text" id="s-host" list="s-host-list" placeholder="Enter name" autocomplete="off">
-          <datalist id="s-host-list">
-            <option value="Children's Lead">
-            <option value="Lead Pastor">
-          </datalist>
-        </div>
-            <div class="form-nav">
-              <button class="btn-next" onclick="sGoStep(3)">Continue <i class="fas fa-arrow-right"></i></button>
-            </div>
-          </div>
-
-          <!-- S-STEP 3: Confirm -->
-          <div class="step-panel" id="s-step-3">
-            <div class="check-group">
-              <label class="check-item">
-                <input type="checkbox" id="s-chk-safeguarding">
-                <span class="check-item-text"><strong>Safeguarding:</strong> I confirm I have read and understood the safeguarding policy and will follow all safeguarding procedures during my time here.</span>
-              </label>
-              <label class="check-item">
-                <input type="checkbox" id="s-chk-gdpr">
-                <span class="check-item-text"><strong>Data Consent:</strong> I consent to my details being stored securely for safeguarding and security purposes in accordance with UK GDPR.</span>
-              </label>
-            </div>
-            <div class="gdpr-box">
-              <strong>Privacy Notice:</strong> Your sign-in details are stored securely for <strong>12 months</strong> then deleted. Used solely for safeguarding, security and emergency evacuation purposes.
-            </div>
+            <p class="implicit-consent">By clicking Sign In you confirm you have read and understood the <strong>City of God Safeguarding Policy</strong>, and consent to your sign-in details being stored securely for 12 months under UK GDPR. Contact us at reception to request access or deletion.</p>
             <div class="form-nav">
               <button class="btn-submit" id="s-btn-submit" onclick="submitStaff()">
                 <span id="s-submit-label"><i class="fas fa-check"></i> Sign In</span>
@@ -1065,7 +1019,6 @@ function resetAll() {
   // parent
   ['p-name-search','p-first','p-last','p-email','p-phone'].forEach(id => { const el=document.getElementById(id); if(el) el.value=''; });
   const pRes = document.getElementById('p-search-results'); if(pRes) pRes.innerHTML = '';
-  ['p-chk-safeguarding','p-chk-gdpr'].forEach(id => { const el=document.getElementById(id); if(el) el.checked=false; });
   childCount = 0;
   previousChildren = [];
   document.getElementById('children-list').innerHTML = '';
@@ -1074,14 +1027,13 @@ function resetAll() {
   document.getElementById('btn-add-child-label').textContent = 'Add Child';
   updateAddChildBtn();
   pCurrentStep = 1;
-  updateProgress('p', 3);
+  updateProgress('p', 2);
   document.querySelectorAll('#screen-parent .step-panel').forEach((p,i) => p.classList.toggle('active', i===0));
   // staff
-  ['s-name-search','s-first','s-last','s-email','s-phone','s-role','s-dbs','s-host'].forEach(id => { const el=document.getElementById(id); if(el) el.value=''; });
+  ['s-name-search','s-first','s-last','s-email','s-phone','s-role','s-dbs'].forEach(id => { const el=document.getElementById(id); if(el) el.value=''; });
   const sRes = document.getElementById('s-search-results'); if(sRes) sRes.innerHTML = '';
-  ['s-chk-safeguarding','s-chk-gdpr'].forEach(id => { const el=document.getElementById(id); if(el) el.checked=false; });
   sCurrentStep = 1;
-  updateProgress('s', 3);
+  updateProgress('s', 2);
   document.querySelectorAll('#screen-staff .step-panel').forEach((p,i) => p.classList.toggle('active', i===0));
 }
 
@@ -1109,13 +1061,11 @@ function startParent() { requestKioskFullscreen(); resetAll(); showScreen('scree
 
 const P_CARD_HEADERS = [
   ['Parent / Guardian Sign In', 'Your details first, then add your children'],
-  ['Children Signing In', 'Select or add the children signing in today'],
-  ['Confirm & Sign In',   'Please read and agree before signing in'],
+  ['Children Signing In',       'Select or add the children signing in today'],
 ];
 const S_CARD_HEADERS = [
-  ['Staff / Volunteer Sign In',  'Search your name or fill in your details'],
-  ['Safeguarding Details',       'DBS check and reporting line'],
-  ['Confirm & Sign In',          'Please read and agree before signing in'],
+  ['Staff / Volunteer Sign In', 'Search your name or fill in your details'],
+  ['Role & Safeguarding',       'Your contact details, role and DBS status'],
 ];
 
 function updatePCardHeader(n) {
@@ -1128,7 +1078,7 @@ function pCardBack() {
   const n = pCurrentStep - 1;
   pCurrentStep = n;
   document.querySelectorAll('#screen-parent .step-panel').forEach((p,i) => p.classList.toggle('active', i+1===n));
-  updateProgress('p', 3);
+  updateProgress('p', 2);
   updatePCardHeader(n);
 }
 
@@ -1140,7 +1090,7 @@ async function pGoStep(n) {
 
   pCurrentStep = n;
   document.querySelectorAll('#screen-parent .step-panel').forEach((p,i) => p.classList.toggle('active', i+1===n));
-  updateProgress('p', 3);
+  updateProgress('p', 2);
   updatePCardHeader(n);
 }
 
@@ -1373,11 +1323,6 @@ function getChildren() {
 }
 
 async function submitParent() {
-  if (!document.getElementById('p-chk-safeguarding').checked)
-    return showToast('Please confirm you have read the safeguarding information.', 'error');
-  if (!document.getElementById('p-chk-gdpr').checked)
-    return showToast('Please consent to data storage to proceed.', 'error');
-
   const btn = document.getElementById('p-btn-submit');
   const lbl = document.getElementById('p-submit-label');
   const spn = document.getElementById('p-spinner');
@@ -1461,7 +1406,7 @@ function sCardBack() {
   const n = sCurrentStep - 1;
   sCurrentStep = n;
   document.querySelectorAll('#screen-staff .step-panel').forEach((p,i) => p.classList.toggle('active', i+1===n));
-  updateProgress('s', 3);
+  updateProgress('s', 2);
   updateSCardHeader(n);
 }
 
@@ -1470,7 +1415,7 @@ function sGoStep(n) {
   if (err) { showToast(err, 'error'); return; }
   sCurrentStep = n;
   document.querySelectorAll('#screen-staff .step-panel').forEach((p,i) => p.classList.toggle('active', i+1===n));
-  updateProgress('s', 3);
+  updateProgress('s', 2);
   updateSCardHeader(n);
 }
 
@@ -1480,23 +1425,17 @@ function sValidateStep(n) {
     if (!val('s-last'))  return 'Please enter your last name.';
     if (!val('s-email')) return 'Please enter your email address.';
     if (!isValidEmail(val('s-email'))) return 'Please enter a valid email address.';
+  }
+  if (n === 2) {
     if (!val('s-phone')) return 'Please enter your phone number.';
     if (!isValidPhone(val('s-phone'))) return 'Please enter a valid phone number.';
     if (!val('s-role'))  return 'Please select your role.';
-  }
-  if (n === 2) {
-    if (!val('s-dbs'))  return 'Please select your DBS certificate status.';
-    if (!val('s-host')) return 'Please enter who you are reporting to.';
+    if (!val('s-dbs'))   return 'Please select your DBS certificate status.';
   }
   return null;
 }
 
 async function submitStaff() {
-  if (!document.getElementById('s-chk-safeguarding').checked)
-    return showToast('Please confirm you have read the safeguarding policy.', 'error');
-  if (!document.getElementById('s-chk-gdpr').checked)
-    return showToast('Please consent to data storage to proceed.', 'error');
-
   const btn = document.getElementById('s-btn-submit');
   const lbl = document.getElementById('s-submit-label');
   const spn = document.getElementById('s-spinner');
@@ -1518,7 +1457,7 @@ async function submitStaff() {
     email:        val('s-email'),
     phone:        val('s-phone'),
     organisation: ORG,
-    host_name:    val('s-host'),
+    host_name:    null,
     purpose:      val('s-role'),
     dbs_status:   val('s-dbs'),
     badge_id:     badgeId,
